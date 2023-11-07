@@ -1,6 +1,8 @@
 package environment;
 
 import java.io.Serializable;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
 
 import javax.sound.midi.SysexMessage;
 
@@ -18,7 +20,10 @@ public class Cell {
 	private BoardPosition position;
 	private Snake ocuppyingSnake = null;
 	private GameElement gameElement=null;
-	
+	//TODO adicionar lock
+	private ReentrantLock lock = new ReentrantLock();
+	//TODO adicionar condition
+	private Condition free = lock.newCondition();
 	public GameElement getGameElement() {
 		return gameElement;
 	}
@@ -33,14 +38,38 @@ public class Cell {
 		return position;
 	}
 
+	// passámos de void para boolean para a aceitar/recusar o rquest
 	public void request(Snake snake)
 			throws InterruptedException {
 		//TODO coordination and mutual exclusion
-		ocuppyingSnake=snake;
+
+		lock.lock();
+		try{
+			while(isOcupied()){
+				free.await();
+			}
+			ocuppyingSnake=snake;
+
+
+		} finally {
+			lock.unlock();
+		}
+	}
+
+	public boolean initialRequest(Snake snake){
+		boolean accepted=false;
+		lock.lock();
+		if(!isOcupied()){
+			ocuppyingSnake=snake;
+			accepted = true;
+		}
+		lock.unlock();
+		return accepted;
 	}
 
 	public void release() {
 		//TODO
+		free.notifyAll();
 	}
 
 	public boolean isOcupiedBySnake() {
@@ -49,7 +78,7 @@ public class Cell {
 
 
 	public  void setGameElement(GameElement element) {
-		// TODO coordination and mutual exclusion
+		//TODO coordination and mutual exclusion
 		gameElement=element;
 
 	}
@@ -65,7 +94,7 @@ public class Cell {
 
 
 	public  Goal removeGoal() {
-		// TODO
+		//TODO
 		return null;
 	}
 	public void removeObstacle() {

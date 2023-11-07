@@ -16,7 +16,7 @@ import environment.Cell;
  */
 public abstract class Snake extends Thread implements Serializable{
 	private static final int DELTA_SIZE = 10;
-	protected LinkedList<Cell> cells = new LinkedList<Cell>();
+	protected LinkedList<Cell> cells = new LinkedList<Cell>();	// células ocupadas pela snake
 	protected int size = 5;
 	private int id;
 	private Board board;
@@ -46,7 +46,7 @@ public abstract class Snake extends Thread implements Serializable{
 	}
 	
 	public LinkedList<BoardPosition> getPath() {
-		LinkedList<BoardPosition> coordinates = new LinkedList<BoardPosition>();
+		LinkedList<BoardPosition> coordinates = new LinkedList<>();
 		for (Cell cell : cells) {
 			coordinates.add(cell.getPosition());
 		}
@@ -56,16 +56,24 @@ public abstract class Snake extends Thread implements Serializable{
 	protected void doInitialPositioning() {
 		// Random position on the first column. 
 		// At startup, snake occupies a single cell
+		BoardPosition at = new BoardPosition(0,0);
 		int posX = 0;
-		int posY = (int) (Math.random() * Board.NUM_ROWS);
-		BoardPosition at = new BoardPosition(posX, posY);
-		
-		try {
-			board.getCell(at).request(this);
-		} catch (InterruptedException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+		boolean done = false;
+
+		while (!done){
+			int posY = (int) (Math.random() * Board.NUM_ROWS);
+			at = new BoardPosition(posX, posY);
+			if(board.getCell(at).initialRequest(this)){
+				done = true;
+			}
 		}
+
+//		try {
+//			board.getCell(at).initialRequest(this);
+//		} catch (InterruptedException e1) {
+//			e1.printStackTrace();
+//		}
+
 		cells.add(board.getCell(at));
 		System.err.println("Snake "+getIdentification()+" starting at:"+getCells().getLast());		
 	}
