@@ -69,7 +69,18 @@ public class Cell {
 
 	public void release() {
 		//TODO
-		free.notifyAll();
+		lock.lock();
+		try{
+			if(isOcupiedBySnake() && ocuppyingSnake.equals(Snake.currentThread())) {
+				ocuppyingSnake = null;
+				free.signalAll();
+			}
+
+		}catch (IllegalMonitorStateException e){
+			System.out.println("notifyAll erro");
+		}finally {
+			lock.unlock();
+		}
 	}
 
 	public boolean isOcupiedBySnake() {

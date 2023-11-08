@@ -41,8 +41,16 @@ public abstract class Snake extends Thread implements Serializable{
 	public LinkedList<Cell> getCells() {
 		return cells;
 	}
+
 	protected void move(Cell cell) throws InterruptedException {
-		// TODO
+		// TODO fazer movimentação para a respetiva célula
+		cell.request(this);
+		cells.add(cell);
+		Cell releaseCell = cells.removeFirst();
+		System.out.println(releaseCell.getPosition().toString());
+		releaseCell.release();
+		board.setChanged();
+
 	}
 	
 	public LinkedList<BoardPosition> getPath() {
@@ -74,7 +82,7 @@ public abstract class Snake extends Thread implements Serializable{
 //			e1.printStackTrace();
 //		}
 
-		cells.add(board.getCell(at));
+		cells.add(board.getCell(at)); //adicionar primeira posição celular da snake à linkedlist
 		System.err.println("Snake "+getIdentification()+" starting at:"+getCells().getLast());		
 	}
 	
