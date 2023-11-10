@@ -37,16 +37,17 @@ public class Cell {
 	}
 
 	// passámos de void para boolean para a aceitar/recusar o rquest
-	public void request(Snake snake)
-			throws InterruptedException {
+	public void request(Snake snake) throws InterruptedException {
 		//TODO coordination and mutual exclusion
-
 		lock.lock();
 		try{
 			while(isOcupied()){
 				free.await();
 			}
 			ocuppyingSnake=snake;
+			if (isOcupiedByGoal()){
+				ocuppyingSnake.eat(getGoal().captureGoal());
+			}
 
 
 		} finally {

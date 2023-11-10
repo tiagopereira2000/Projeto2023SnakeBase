@@ -6,10 +6,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Observable;
 
-import game.GameElement;
-import game.Goal;
-import game.Obstacle;
-import game.Snake;
+import game.*;
 
 public abstract class Board extends Observable {
 	protected Cell[][] cells;
@@ -20,7 +17,7 @@ public abstract class Board extends Observable {
 	public static final int NUM_ROWS = 30;
 	protected LinkedList<Snake> snakes = new LinkedList<>();
 	private LinkedList<Obstacle> obstacles= new LinkedList<>();
-	protected boolean isFinished;
+	protected boolean isFinished = false;
 
 	public Board() {
 		cells = new Cell[NUM_COLUMNS][NUM_ROWS];
@@ -30,6 +27,10 @@ public abstract class Board extends Observable {
 			}
 		}
 
+	}
+
+	public boolean isFinished() {
+		return isFinished;
 	}
 
 	public Cell getCell(BoardPosition cellCoord) {
@@ -81,7 +82,7 @@ public abstract class Board extends Observable {
 	
 
 	protected Goal addGoal() {
-		Goal goal=new Goal(this);
+		Goal goal= Goal.getInstance(this); // uma só instância do goal
 		addGameElement(goal);
 		return goal;
 	}
@@ -126,5 +127,16 @@ public abstract class Board extends Observable {
 		snakes.add(snake);
 	}
 
+	public void wakeLazySnakes() {
+		for (Snake s: snakes) {
+			if(s instanceof AutomaticSnake){
+				s.interrupt();
+			}
+		}
+	}
 
+	public void terminate() {
+		isFinished=true;
+		wakeLazySnakes();
+	}
 }
