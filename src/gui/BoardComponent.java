@@ -64,7 +64,7 @@ public class BoardComponent extends JComponent implements KeyListener{
 					else if(cell.getGameElement() instanceof Goal) {
 						Goal goal=(Goal)cell.getGameElement() ;
 						g.setColor(Color.RED);
-						g.setFont(new Font(Font.MONOSPACED,Font.PLAIN,(int)CELL_WIDTH));
+						g.setFont(new Font(Font.MONOSPACED,Font.BOLD,(int)CELL_WIDTH));
 						g.drawString(goal.getValue()+"", (int)Math.round((cell.getPosition().x+0.15)* CELL_WIDTH), 
 								(int)Math.round((cell.getPosition().y+0.9) * CELL_WIDTH));
 					}

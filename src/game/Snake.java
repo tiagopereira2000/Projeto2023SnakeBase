@@ -18,9 +18,10 @@ public abstract class Snake extends Thread implements Serializable{
 	private static final int DELTA_SIZE = 10;
 	protected LinkedList<Cell> cells = new LinkedList<Cell>();	// células ocupadas pela snake
 	protected int size = 5;
+	private int digestion = 0;
 	private int id;
 	private Board board;
-	
+
 	public Snake(int id,Board board) {
 		this.id = id;
 		this.board=board;
@@ -44,13 +45,20 @@ public abstract class Snake extends Thread implements Serializable{
 
 	protected void move(Cell cell) throws InterruptedException {
 		// TODO fazer movimentação para a respetiva célula
-		cell.request(this);
-		cells.add(cell);
-		Cell releaseCell = cells.removeFirst();
-		System.out.println(releaseCell.getPosition().toString());
-		releaseCell.release();
+		cell.request(this); //request da ocupação da célula -> fica em espera se a célula estiver ocupada
+		cells.add(cell); //  request completo;  adicionar célula à cabeça da snake (movimentação)
+		if(digestion == 0){
+			Cell releaseCell = cells.removeFirst(); //se não comeu premio -> eliminar a ultima posição ocupada pela cobra
+			releaseCell.release(); //desocupar célula
+		} else {
+			digestion -= 1;
+		}
 		board.setChanged();
 
+	}
+
+	public void eat(int goalValue){
+		digestion += goalValue;
 	}
 	
 	public LinkedList<BoardPosition> getPath() {

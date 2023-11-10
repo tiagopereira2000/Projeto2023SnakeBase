@@ -20,9 +20,7 @@ public class Cell {
 	private BoardPosition position;
 	private Snake ocuppyingSnake = null;
 	private GameElement gameElement=null;
-	//TODO adicionar lock
 	private ReentrantLock lock = new ReentrantLock();
-	//TODO adicionar condition
 	private Condition free = lock.newCondition();
 	public GameElement getGameElement() {
 		return gameElement;
@@ -39,16 +37,17 @@ public class Cell {
 	}
 
 	// passámos de void para boolean para a aceitar/recusar o rquest
-	public void request(Snake snake)
-			throws InterruptedException {
+	public void request(Snake snake) throws InterruptedException {
 		//TODO coordination and mutual exclusion
-
 		lock.lock();
 		try{
 			while(isOcupied()){
 				free.await();
 			}
 			ocuppyingSnake=snake;
+			if (isOcupiedByGoal()){
+				ocuppyingSnake.eat(getGoal().captureGoal());
+			}
 
 
 		} finally {
@@ -88,14 +87,16 @@ public class Cell {
 	}
 
 
-	public  void setGameElement(GameElement element) {
+	public void setGameElement(GameElement element) {
 		//TODO coordination and mutual exclusion
-		gameElement=element;
-
+		lock.lock();
+		if(!isOcupied() || !isOcupiedByGoal())
+			gameElement=element;
+		lock.unlock();
 	}
 
 	public boolean isOcupied() {
-		return isOcupiedBySnake() || (gameElement!=null && gameElement instanceof Obstacle);
+		return isOcupiedBySnake() || isOcupiedByObstacle();
 	}
 
 
@@ -104,12 +105,18 @@ public class Cell {
 	}
 
 
-	public  Goal removeGoal() {
-		//TODO
-		return null;
+	public Goal removeGoal() {
+		Goal goal = getGoal();
+		if(goal != null){
+			gameElement = null;
+		}
+		return goal;
 	}
+
 	public void removeObstacle() {
-	//TODO
+		if(isOcupiedByObstacle())
+			gameElement = null;
+		free.signalAll();
 	}
 
 
@@ -120,6 +127,10 @@ public class Cell {
 
 	public boolean isOcupiedByGoal() {
 		return (gameElement!=null && gameElement instanceof Goal);
+	}
+
+	public boolean isOcupiedByObstacle(){
+		return (gameElement != null && gameElement instanceof Obstacle);
 	}
 	
 	
