@@ -2,7 +2,7 @@ package game;
 
 import environment.LocalBoard;
 
-public class ObstacleMover extends Thread {
+public class ObstacleMover implements Runnable {
 	private Obstacle obstacle;
 	private LocalBoard board;
 	

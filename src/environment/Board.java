@@ -89,12 +89,17 @@ public abstract class Board extends Observable {
 
 	protected void addObstacles(int numberObstacles) {
 		// clear obstacle list , necessary when resetting obstacles.
+		ThreadPool pool = new ThreadPool(3);
 		getObstacles().clear();
 		while(numberObstacles>0) {
 			Obstacle obs=new Obstacle(this);
 			addGameElement( obs);
 			getObstacles().add(obs);
 			numberObstacles--;
+
+			ObstacleMover obsMov =  ;
+
+			...
 		}
 	}
 	

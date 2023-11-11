@@ -12,10 +12,7 @@ import environment.Cell;
 import environment.Board;
 import environment.BoardPosition;
 
-/**
- *
- * @author ASUS-Tiago
- * */
+
 public class AutomaticSnake extends Snake {
 	protected boolean resetMove = false; //se a snake tiver sido interrompida para adotar outro caminho
 	public AutomaticSnake(int id, LocalBoard board) {
