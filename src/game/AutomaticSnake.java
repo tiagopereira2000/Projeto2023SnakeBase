@@ -43,11 +43,6 @@ public class AutomaticSnake extends Snake {
 				move(nextCell); // Snake.move()
 				Thread.sleep(Board.PLAYER_PLAY_INTERVAL);
 			}catch (InterruptedException e){
-				/*
-				* 2 interrupt types:
-				* 	- terminate game() -> Board.isFinished = true -> break: out of while
-				* 	- reset snake move() -> resetMove = true -> continue on while
-				* */
 				if(getBoard().isFinished()){
 					break;
 				}
