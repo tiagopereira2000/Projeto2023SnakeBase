@@ -65,18 +65,15 @@ public class AutomaticSnake extends Snake {
 			options.removeIf(p -> getBoard().getCell(p).isOcupied()); // (2)
 			resetMove = false;
 		}
-<<<<<<< Updated upstream
+
 		options.removeIf(i -> getPath().contains(i)); //(1)
-		double min = 100; // ~= infinite
-		BoardPosition bestOption = options.get(0); //initialize bestOption = options[0]
-=======
 		BoardPosition ini = new BoardPosition(0,0);
 		BoardPosition end= new BoardPosition(Board.NUM_COLUMNS, Board.NUM_ROWS);
 
 		options.removeIf(i -> getPath().contains(i)); // options - getPath()
 		double min = ini.distanceTo(end);
 		BoardPosition bestOption = options.get(0); //inicializar com a primeira opção
->>>>>>> Stashed changes
+
 		for (BoardPosition p: options) {
 			double distance = p.distanceTo(goal); // (3)
 			if(distance < min){
