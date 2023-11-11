@@ -23,6 +23,14 @@ public class AutomaticSnake extends Snake {
 
 	}
 
+	/**
+	 * <h3>run</h3>
+	 * the automatic snakes will iterate every 100ms and request for a move, until is interrupted.
+	 * There are 2 types of interruption on AutomaticSnakes:
+	 * <p>the game was <b>terminated</b> and the Snakes will be terminated as well</p>
+	 * <p>the button to <b>handle locked</b> movements</p>
+	 *
+	 */
 	@Override
 	public void run() {
 		doInitialPositioning();
@@ -50,13 +58,12 @@ public class AutomaticSnake extends Snake {
 	}
 
 	/**
-	 * getNextPosition:
-	 * @return	best option to move ({@link BoardPosition})
-	 *
+	 * <h3>getNextPosition</h3>
 	 * options =
-	 * 	if not Interrupted : { neighbors and (cells not ocupied by the snake) } (1)
-	 * 	if Interrupted : { (1) and (cells not ocupied by obstacles or other snakes) } (2)
-	 * Then, from the options left lets take the nearest to the goal (3)
+	 * <p>if not Interrupted : { neighbors and (cells not ocupied by the snake) } (1)</p>
+	 * <p>if Interrupted : { (1) and (cells not ocupied by obstacles or other snakes) } (2)</p>
+	 * <P>Then, from the options left lets take the nearest to the goal (3)</P>
+	 * @return	best option to move ({@link BoardPosition})
 	 **/
 	private BoardPosition getNextPosition(){
 		BoardPosition goal = getBoard().getGoalPosition();
