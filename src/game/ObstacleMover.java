@@ -15,5 +15,9 @@ public class ObstacleMover implements Runnable {
 	@Override
 	public void run() {
 		// TODO
+
+		
+
+
 	}
 }

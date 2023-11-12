@@ -1,5 +1,6 @@
 package game;
 
+import java.time.Clock;
 import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -11,7 +12,7 @@ public class ThreadPool {
 
     ReentrantLock lock = new ReentrantLock();
 
-    Condition isEmpty = new ReentrantLock().newCondition();
+    Condition isEmpty = lock.newCondition();
 
     int numThreads;
     LinkedBlockingQueue<Runnable> list = new LinkedBlockingQueue<Runnable>();
@@ -39,6 +40,13 @@ public class ThreadPool {
     }
 
 
+    public void shutdownNow(){
+        for(ClassTrabalhadora t:trabalhadores){
+            t.interrupt();
+        }
+    }
+
+
 
     public class ClassTrabalhadora extends Thread{
 
@@ -47,20 +55,35 @@ public class ThreadPool {
         public void run() {
 
             while(true) {
+
+                try {
                 lock.lock();
+                System.out.println("Running obstacle mover...");
                 while (list.isEmpty()) {
-                    try {
+
                         isEmpty.await();
-                    } catch (InterruptedException e) {
-                        throw new RuntimeException(e);
-                    }
+
+
                 }
 
                 Runnable tarefa = list.poll();
 
                 tarefa.run();
 
-                lock.unlock();
+
+
+                }
+
+                catch (InterruptedException e) {
+                    System.out.println("Obstaculo Interrompido");
+                }
+
+                finally {
+                    lock.unlock();
+
+                }
+
+
             }
         }
     }

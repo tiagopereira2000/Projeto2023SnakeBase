@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Observable;
 
 import game.*;
+//import jdk.vm.ci.meta.Local;
 
 public abstract class Board extends Observable {
 	protected Cell[][] cells;
@@ -18,6 +19,9 @@ public abstract class Board extends Observable {
 	protected LinkedList<Snake> snakes = new LinkedList<>();
 	private LinkedList<Obstacle> obstacles= new LinkedList<>();
 	protected boolean isFinished = false;
+
+	protected ThreadPool pool = new ThreadPool(3);
+
 
 	public Board() {
 		cells = new Cell[NUM_COLUMNS][NUM_ROWS];
@@ -89,7 +93,6 @@ public abstract class Board extends Observable {
 
 	protected void addObstacles(int numberObstacles) {
 		// clear obstacle list , necessary when resetting obstacles.
-		ThreadPool pool = new ThreadPool(3);
 		getObstacles().clear();
 		while(numberObstacles>0) {
 			Obstacle obs=new Obstacle(this);
@@ -97,10 +100,12 @@ public abstract class Board extends Observable {
 			getObstacles().add(obs);
 			numberObstacles--;
 
-			ObstacleMover obsMov =  ;
+			ObstacleMover obsMov =new ObstacleMover(obs,(LocalBoard) this);
 
-			...
+			pool.submit(obsMov);
 		}
+
+		pool.execute();
 	}
 	
 	public LinkedList<Snake> getSnakes() {
@@ -143,5 +148,6 @@ public abstract class Board extends Observable {
 	public void terminate() {
 		isFinished=true;
 		wakeLazySnakes();
+		pool.shutdownNow();
 	}
 }
