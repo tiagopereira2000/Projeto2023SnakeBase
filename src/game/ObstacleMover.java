@@ -13,7 +13,17 @@ public class ObstacleMover extends Thread {
 	}
 
 	@Override
-	public void run() {
-		// TODO
+	public void run(){
+		while(obstacle.hasRemainingMoves()){
+			//mover obstaculo movimento random
+			board.moveObstacle(obstacle);
+			obstacle.decrementRemaingMoves();
+			board.setChanged();
+			try{
+				Thread.sleep(Obstacle.OBSTACLE_MOVE_INTERVAL);
+			}catch (InterruptedException e){
+				break;
+			}
+		}
 	}
 }

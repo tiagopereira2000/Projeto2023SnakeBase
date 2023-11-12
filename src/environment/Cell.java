@@ -1,17 +1,14 @@
 package environment;
 
-import java.io.Serializable;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
-
-import javax.sound.midi.SysexMessage;
 
 import game.GameElement;
 import game.Goal;
 import game.Obstacle;
 import game.Snake;
-import game.AutomaticSnake;
-/** Main class for game representation. 
+
+/** Main class for game representation.
  * 
  * @author luismota
  *
@@ -105,18 +102,21 @@ public class Cell {
 	}
 
 
-	public Goal removeGoal() {
-		Goal goal = getGoal();
-		if(goal != null){
+	public void removeGoal() {
+		lock.lock();
+		if(isOcupiedByGoal()){
 			gameElement = null;
 		}
-		return goal;
+		free.signalAll();
+		lock.unlock();
 	}
 
 	public void removeObstacle() {
+		lock.lock();
 		if(isOcupiedByObstacle())
 			gameElement = null;
 		free.signalAll();
+		lock.unlock();
 	}
 
 

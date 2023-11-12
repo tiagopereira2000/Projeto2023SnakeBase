@@ -1,13 +1,12 @@
 package game;
 
 import environment.Board;
-import environment.LocalBoard;
 
 public class Obstacle extends GameElement {
 	
 	
 	private static final int NUM_MOVES=3;
-	private static final int OBSTACLE_MOVE_INTERVAL = 400;
+	public static final int OBSTACLE_MOVE_INTERVAL = 400;
 	private int remainingMoves=NUM_MOVES;
 	private Board board;
 	public Obstacle(Board board) {
@@ -18,5 +17,13 @@ public class Obstacle extends GameElement {
 	public int getRemainingMoves() {
 		return remainingMoves;
 	}
+
+	public void decrementRemaingMoves(){
+		remainingMoves -= 1;
+	}
+	public boolean hasRemainingMoves(){
+		return remainingMoves > 0;
+	}
+
 
 }

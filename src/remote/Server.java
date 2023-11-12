@@ -1,4 +1,4 @@
-package game;
+package remote;
 
 public class Server {
 	// TODO
