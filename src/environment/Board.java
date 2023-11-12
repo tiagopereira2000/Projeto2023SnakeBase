@@ -17,10 +17,9 @@ public abstract class Board extends Observable {
 	public static final int NUM_COLUMNS = 30;
 	public static final int NUM_ROWS = 30;
 	protected LinkedList<Snake> snakes = new LinkedList<>();
-	private LinkedList<Obstacle> obstacles= new LinkedList<>();
+	private LinkedList<Obstacle> obstacles = new LinkedList<>();
 	protected boolean isFinished = false;
 
-	protected ThreadPool pool = new ThreadPool(3);
 
 
 	public Board() {
@@ -59,10 +58,25 @@ public abstract class Board extends Observable {
 			BoardPosition pos=getRandomPosition();
 			if(!getCell(pos).isOcupied() && !getCell(pos).isOcupiedByGoal()) {
 				getCell(pos).setGameElement(gameElement);
+				gameElement.setPosition(pos);
 				if(gameElement instanceof Goal) {
 					setGoalPosition(pos);
 //					System.out.println("Goal placed at:"+pos);
 				}
+				placed=true;
+			}
+		}
+	}
+
+	public void moveObstacle(Obstacle obstacle){
+		BoardPosition prevPosition=obstacle.getPosition();
+		boolean placed=false;
+		while(!placed) {
+			BoardPosition pos=getRandomPosition();
+			if(!getCell(pos).isOcupied() && !getCell(pos).isOcupiedByGoal()) {
+				getCell(pos).setGameElement(obstacle);
+				obstacle.setPosition(pos);
+				getCell(prevPosition).removeObstacle();
 				placed=true;
 			}
 		}
@@ -93,19 +107,13 @@ public abstract class Board extends Observable {
 
 	protected void addObstacles(int numberObstacles) {
 		// clear obstacle list , necessary when resetting obstacles.
-		getObstacles().clear();
+		obstacles.clear();
 		while(numberObstacles>0) {
 			Obstacle obs=new Obstacle(this);
-			addGameElement( obs);
-			getObstacles().add(obs);
+			addGameElement(obs);
+			obstacles.add(obs);
 			numberObstacles--;
-
-			ObstacleMover obsMov =new ObstacleMover(obs,(LocalBoard) this);
-
-			pool.submit(obsMov);
 		}
-
-		pool.execute();
 	}
 	
 	public LinkedList<Snake> getSnakes() {
@@ -148,6 +156,5 @@ public abstract class Board extends Observable {
 	public void terminate() {
 		isFinished=true;
 		wakeLazySnakes();
-		pool.shutdownNow();
 	}
 }

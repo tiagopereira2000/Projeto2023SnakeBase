@@ -2,7 +2,7 @@ package game;
 
 import environment.LocalBoard;
 
-public class ObstacleMover implements Runnable {
+public class ObstacleMover extends Thread {
 	private Obstacle obstacle;
 	private LocalBoard board;
 	
@@ -13,11 +13,17 @@ public class ObstacleMover implements Runnable {
 	}
 
 	@Override
-	public void run() {
-		// TODO
-
-		
-
-
+	public void run(){
+		while(obstacle.hasRemainingMoves()){
+			//mover obstaculo movimento random
+			board.moveObstacle(obstacle);
+			obstacle.decrementRemaingMoves();
+			board.setChanged();
+			try{
+				Thread.sleep(Obstacle.OBSTACLE_MOVE_INTERVAL);
+			}catch (InterruptedException e){
+				break;
+			}
+		}
 	}
 }

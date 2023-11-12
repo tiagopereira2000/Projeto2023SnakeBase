@@ -1,19 +1,6 @@
 package environment;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Observable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
-import game.GameElement;
-import game.Goal;
-import game.Obstacle;
-import game.Server;
-import game.Snake;
-import game.AutomaticSnake;
+import game.*;
 
 /** Class representing the state of a game running locally
  * 
@@ -25,18 +12,20 @@ public class LocalBoard extends Board{
 	private static final int NUM_SNAKES = 2;
 	private static final int NUM_OBSTACLES = 20;
 	private static final int NUM_SIMULTANEOUS_MOVING_OBSTACLES = 3;
-
+	private static ThreadPool pool = new ThreadPool(NUM_SIMULTANEOUS_MOVING_OBSTACLES);
 	
 
 	public LocalBoard() {
-		
 		for (int i = 0; i < NUM_SNAKES; i++) {
 			AutomaticSnake snake = new AutomaticSnake(i, this);
 			snakes.add(snake);
 		}
-
 		addObstacles(NUM_OBSTACLES);
-		
+		for(Obstacle o: getObstacles()){
+			ObstacleMover obsMov = new ObstacleMover(o,this);
+			pool.submit(obsMov);
+		}
+
 		Goal goal=addGoal();
 //		System.err.println("All elements placed");
 	}
@@ -44,7 +33,7 @@ public class LocalBoard extends Board{
 	public void init() {
 		for(Snake s:snakes)
 			s.start();
-		// TODO: launch other threads
+		pool.execute();
 		setChanged();
 	}
 
