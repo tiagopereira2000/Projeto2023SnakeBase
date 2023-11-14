@@ -60,25 +60,27 @@ public class AutomaticSnake extends Snake {
 	private BoardPosition getNextPosition(){
 		BoardPosition goal = getBoard().getGoalPosition();
 		List<BoardPosition> options = getBoard().getNeighboringPositions(cells.getLast());
-		if(resetMove){ 	//snake interrupted -> excluir células com obstaculos
-			options.removeIf(p -> getBoard().getCell(p).isOcupied()); // (2)
-			resetMove = false;
-		}
-
-		options.removeIf(i -> getPath().contains(i)); //(1)
-		BoardPosition ini = new BoardPosition(0,0);
-		BoardPosition end= new BoardPosition(Board.NUM_COLUMNS, Board.NUM_ROWS);
-
-		options.removeIf(i -> getPath().contains(i)); // options - getPath()
-		double min = ini.distanceTo(end);
 		BoardPosition bestOption = options.get(0); //inicializar com a primeira opção
 
-		for (BoardPosition p: options) {
-			double distance = p.distanceTo(goal); // (3)
-			if(distance < min){
-				min = distance;
-				bestOption = p;
+		options.removeIf(i -> getPath().contains(i)); //(1)
+
+		if(resetMove){ 	//snake interrupted -> excluir células com obstaculos
+			options.removeIf(p -> getBoard().getCell(p).isOcupiedByObstacle()); // (2)
+			resetMove = false;
+		}
+		BoardPosition ini = new BoardPosition(0,0);
+		BoardPosition end= new BoardPosition(Board.NUM_COLUMNS, Board.NUM_ROWS);
+		double min = ini.distanceTo(end);
+
+		if(!options.isEmpty()){
+			for (BoardPosition p: options) {
+				double distance = p.distanceTo(goal); // (3)
+				if(distance < min){
+					min = distance;
+					bestOption = p;
+				}
 			}
+
 		}
 		return bestOption;
 	}
