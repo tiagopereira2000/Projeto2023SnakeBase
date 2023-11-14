@@ -54,7 +54,6 @@ public abstract class Snake extends Thread implements Serializable{
 			digestion -= 1;
 		}
 		board.setChanged();
-
 	}
 
 	public void eat(int goalValue){

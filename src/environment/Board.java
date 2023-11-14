@@ -14,8 +14,8 @@ public abstract class Board extends Observable {
 	private BoardPosition goalPosition;
 	public static final long PLAYER_PLAY_INTERVAL = 100;
 	public static final long REMOTE_REFRESH_INTERVAL = 200;
-	public static final int NUM_COLUMNS = 15;
-	public static final int NUM_ROWS = 15;
+	public static final int NUM_COLUMNS = 30;
+	public static final int NUM_ROWS = 30;
 	protected LinkedList<Snake> snakes = new LinkedList<>();
 	private LinkedList<Obstacle> obstacles = new LinkedList<>();
 	protected boolean isFinished = false;
@@ -155,6 +155,6 @@ public abstract class Board extends Observable {
 
 	public void terminate() {
 		isFinished=true;
-		wakeLazySnakes();
+		wakeLazySnakes(); // TODO deixar a cobra crescer depois do comer o 9º prémio
 	}
 }

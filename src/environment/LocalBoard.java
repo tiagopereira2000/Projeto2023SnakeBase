@@ -9,8 +9,8 @@ import game.*;
  */
 public class LocalBoard extends Board{
 	
-	private static final int NUM_SNAKES = 2;
-	private static final int NUM_OBSTACLES = 20;
+	private static final int NUM_SNAKES = 3;
+	private static final int NUM_OBSTACLES = 25;
 	private static final int NUM_SIMULTANEOUS_MOVING_OBSTACLES = 3;
 	private static ThreadPool pool = new ThreadPool(NUM_SIMULTANEOUS_MOVING_OBSTACLES);
 	

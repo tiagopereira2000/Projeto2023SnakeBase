@@ -60,9 +60,9 @@ public class AutomaticSnake extends Snake {
 	private BoardPosition getNextPosition(){
 		BoardPosition goal = getBoard().getGoalPosition();
 		List<BoardPosition> options = getBoard().getNeighboringPositions(cells.getLast());
-		BoardPosition bestOption = options.get(0); //inicializar com a primeira opção
 
 		options.removeIf(i -> getPath().contains(i)); //(1)
+		BoardPosition bestOption = options.get(0); //inicializar com a primeira opção
 
 		if(resetMove){ 	//snake interrupted -> excluir células com obstaculos
 			options.removeIf(p -> getBoard().getCell(p).isOcupiedByObstacle()); // (2)
