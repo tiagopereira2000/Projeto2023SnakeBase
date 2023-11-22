@@ -40,9 +40,8 @@ public class AutomaticSnake extends Snake {
 				move(nextCell); // Snake.move()
 				Thread.sleep(Board.PLAYER_PLAY_INTERVAL);
 			}catch (InterruptedException e){
-				if(getBoard().isFinished()){
+				if(getBoard().isFinished())
 					break;
-				}
 				System.out.println("Snake interrompida -> reset direção");
 				resetMove = true;
 			}

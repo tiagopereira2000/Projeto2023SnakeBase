@@ -9,7 +9,7 @@ import game.*;
  */
 public class LocalBoard extends Board{
 	
-	private static final int NUM_SNAKES = 2;
+	private static final int NUM_SNAKES = 5;
 	private static final int NUM_OBSTACLES = 20;
 	private static final int NUM_SIMULTANEOUS_MOVING_OBSTACLES = 3;
 	private static ThreadPool pool = new ThreadPool(NUM_SIMULTANEOUS_MOVING_OBSTACLES);
@@ -26,8 +26,7 @@ public class LocalBoard extends Board{
 			pool.submit(obsMov);
 		}
 
-		Goal goal=addGoal();
-//		System.err.println("All elements placed");
+		Goal goal = addGoal();
 	}
 
 	public void init() {
@@ -49,8 +48,9 @@ public class LocalBoard extends Board{
 		// do nothing... No keys relevant in local game
 	}
 
-
-
-
-
+	@Override
+	public void terminate() {
+		super.terminate();
+		pool.shutdownNow();
+	}
 }

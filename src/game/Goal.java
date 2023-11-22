@@ -13,6 +13,14 @@ public class Goal extends GameElement {
 	private static Thread goalThread;
 	public Goal(Board board2) {
 		this.board = board2;
+		goalThread = new Thread(() -> {
+			try {
+				Thread.sleep((MAX_VALUE-1) * 100);
+			}catch (InterruptedException ignored){
+
+			}
+			board.terminate();
+		});
 	}
 	
 	public int getValue() {
@@ -31,19 +39,11 @@ public class Goal extends GameElement {
 		return instance;
 	}
 
-	public int captureGoal() {
-//		TODO ao ser capturado vai surgir numa nova posição com um novo valor
-		int prizeSize = value;
-
-		if(value < MAX_VALUE-1) {
-			incrementValue();
-			BoardPosition goalPosition = board.getGoalPosition();
-			Cell goalCell = board.getCell(goalPosition);
-			goalCell.removeGoal();
-			board.addGameElement(this);
-		} else board.terminate();
-
-		return prizeSize;
+	public void relocateGoal() {
+		incrementValue();
+		board.addGameElement(this);
+		if(value == MAX_VALUE)
+			goalThread.start();
 	}
 
 }

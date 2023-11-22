@@ -1,5 +1,6 @@
 package environment;
 
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -33,7 +34,6 @@ public class Cell {
 		return position;
 	}
 
-	// passámos de void para boolean para a aceitar/recusar o rquest
 	public void request(Snake snake) throws InterruptedException {
 		//TODO coordination and mutual exclusion
 		lock.lock();
@@ -42,11 +42,13 @@ public class Cell {
 				free.await();
 			}
 			ocuppyingSnake=snake;
+			snake.addCell(this);
 			if (isOcupiedByGoal()){
-				ocuppyingSnake.eat(getGoal().captureGoal());
+				Goal goal = getGoal();
+				ocuppyingSnake.eat(goal.getValue());
+				gameElement = null;
+				goal.relocateGoal();
 			}
-
-
 		} finally {
 			lock.unlock();
 		}
@@ -63,11 +65,11 @@ public class Cell {
 		return accepted;
 	}
 
-	public void release() {
-		//TODO
+	public void release(Snake snake) {
 		lock.lock();
 		try{
-			if(isOcupiedBySnake() && ocuppyingSnake.equals(Snake.currentThread())) {
+			if(isOcupiedBySnake() && ocuppyingSnake.equals(snake)) {
+				snake.removeFirstCell();
 				ocuppyingSnake = null;
 				free.signalAll();
 			}
@@ -84,12 +86,16 @@ public class Cell {
 	}
 
 
-	public void setGameElement(GameElement element) {
-		//TODO coordination and mutual exclusion
+	public boolean setGameElement(GameElement element) {
 		lock.lock();
-		if(!isOcupied() || !isOcupiedByGoal())
-			gameElement=element;
+		if(!isOcupied() && !isOcupiedByGoal()) {
+			element.setPosition(position);
+			gameElement = element;
+			lock.unlock();
+			return true;
+		}
 		lock.unlock();
+		return false;
 	}
 
 	public boolean isOcupied() {
@@ -102,14 +108,6 @@ public class Cell {
 	}
 
 
-	public void removeGoal() {
-		lock.lock();
-		if(isOcupiedByGoal()){
-			gameElement = null;
-		}
-		free.signalAll();
-		lock.unlock();
-	}
 
 	public void removeObstacle() {
 		lock.lock();
