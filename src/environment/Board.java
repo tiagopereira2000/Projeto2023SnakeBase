@@ -144,6 +144,6 @@ public abstract class Board extends Observable {
 
 	public void terminate() {
 		isFinished=true;
-		wakeLazySnakes();
+		wakeLazySnakes(); // TODO deixar a cobra crescer depois do comer o 9º prémio
 	}
 }
