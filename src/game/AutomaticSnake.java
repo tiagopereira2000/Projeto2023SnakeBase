@@ -33,16 +33,14 @@ public class AutomaticSnake extends Snake {
 		doInitialPositioning();
 		System.err.println("initial size:" + getCells().size());
 
-		//TODO: automatic movement
 		while(true){
 			Cell nextCell = getBoard().getCell(getNextPosition()); //NextPosition() -> (BP) bestoption -> (Cell) bestoption
 			try {
-				move(nextCell); // Snake.move()
+				move(nextCell);
 				Thread.sleep(Board.PLAYER_PLAY_INTERVAL);
 			}catch (InterruptedException e){
 				if(getBoard().isFinished())
 					break;
-//				System.out.println("Snake interrompida -> reset direção");
 				resetMove = true;
 			}
 		}

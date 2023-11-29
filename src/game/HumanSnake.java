@@ -20,6 +20,7 @@ public class HumanSnake extends Snake {
 
 	/**
 	 * Tarefa da thread de {@link HumanSnake}
+	 * Esta thread estará a correr do Lado do {@link remote.Server}.
 	 * realiza a sua posição inicial na {@link Board}
 	 * Após o posicionamento começa o seu movimento começando no sentido da esquerda para a direita.
 	 * A cada PLAYER_PLAY_INTERVAL lê o último código do sentido lido do teclado e realiza o movimento,

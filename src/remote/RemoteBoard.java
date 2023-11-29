@@ -23,17 +23,18 @@ public class RemoteBoard extends Board{
 	
 	@Override
 	public void handleKeyPress(int keyCode) {
-		//TODO
+		//TODO O cliente vai pressionar uma tecla e vai enviá-la para o servidor realizar o seu movimento
 	}
 
 	@Override
 	public void handleKeyRelease() {
-		// TODO
+		// TODO em princípio vai ser ignorado
 	}
 
 	@Override
 	public void init() {
-		// TODO 		
+		// TODO faz um pedido de inserção do player na board do servidor
+		// TODO recebe do cliente a board
 	}
 
 
