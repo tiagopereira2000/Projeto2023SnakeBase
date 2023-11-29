@@ -1,6 +1,7 @@
 package game;
 
 import environment.Board;
+import environment.BoardPosition;
 
 public class Obstacle extends GameElement {
 	
@@ -25,5 +26,11 @@ public class Obstacle extends GameElement {
 		return remainingMoves > 0;
 	}
 
-
+	@Override
+	public void setPosition(BoardPosition position) {
+		try{
+			board.getCell(getPosition()).removeObstacle();
+		}catch (NullPointerException ignored) {}
+		super.setPosition(position);
+	}
 }

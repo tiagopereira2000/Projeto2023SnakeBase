@@ -43,7 +43,7 @@ public class ThreadPool {
 
             while(true) {
                 try {
-                    System.out.println("Running obstacle mover...");
+//                    System.out.println("Running obstacle mover...");
                     ObstacleMover mover = list.take();
                     mover.start();
                     mover.join();

@@ -10,6 +10,10 @@ public abstract class GameElement{
         return position;
     }
 
+//    public boolean isSettedUp(){
+//        return getPosition() != null;
+//    }
+
     public void setPosition(BoardPosition position) {
         this.position = position;
     }

@@ -46,18 +46,19 @@ public class SnakeGui implements Observer {
 		frame.add(boardGui,BorderLayout.CENTER);
 
 		JButton resetObstaclesButton=new JButton("Reset snakes' directions");
+
+		/*Após o clique no botão "reset snakes" a gui perde o foco na janela e
+		* respetivos keyListener. É necessário então fazer um pedido de foco na janela
+		* para continuar a ler o teclado.*/
 		resetObstaclesButton.addActionListener(new ActionListener() {
-			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO
 				board.wakeLazySnakes();
+				boardGui.requestFocusInWindow(); //foi me aconselhado usar este método.
 			}
-				
 		});
+
 		frame.add(resetObstaclesButton,BorderLayout.SOUTH);
-		
-		
 		frame.pack();
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}

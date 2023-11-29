@@ -12,7 +12,7 @@ import game.*;
 public abstract class Board extends Observable {
 	protected Cell[][] cells;
 	private BoardPosition goalPosition;
-	public static final long PLAYER_PLAY_INTERVAL = 100;
+	public static final long PLAYER_PLAY_INTERVAL = 150;
 	public static final long REMOTE_REFRESH_INTERVAL = 200;
 	public static final int NUM_COLUMNS = 30;
 	public static final int NUM_ROWS = 30;
@@ -40,8 +40,14 @@ public abstract class Board extends Observable {
 		return cells[cellCoord.x][cellCoord.y];
 	}
 
+	public boolean isOutOfBounds(BoardPosition p){
+		if (p.x >= NUM_COLUMNS || p.x < 0 || p.y >= NUM_ROWS || p.y < 0)
+			return true;
+		return false;
+	}
+
 	protected BoardPosition getRandomPosition() {
-		return new BoardPosition((int) (Math.random() *NUM_ROWS),(int) (Math.random() * NUM_ROWS));
+		return new BoardPosition((int) (Math.random() *NUM_COLUMNS),(int) (Math.random() * NUM_ROWS));
 	}
 
 	public BoardPosition getGoalPosition() {
@@ -55,29 +61,27 @@ public abstract class Board extends Observable {
 	public void addGameElement(GameElement gameElement) {
 		boolean placed=false;
 		while(!placed) {
-			BoardPosition pos=getRandomPosition();
-			if(!getCell(pos).isOcupied() && !getCell(pos).isOcupiedByGoal()) {
-				getCell(pos).setGameElement(gameElement);
-				gameElement.setPosition(pos);
+			BoardPosition pos = getRandomPosition();
+			if(getCell(pos).setGameElement(gameElement)) {
 				if(gameElement instanceof Goal) {
 					setGoalPosition(pos);
-//					System.out.println("Goal placed at:"+pos);
 				}
 				placed=true;
 			}
 		}
 	}
 
+	/**
+	 * Implementado da mesma forma que addGameElement.
+	 * Não tendo em conta elementos do tipo Goal.
+	 * @param obstacle
+	 */
 	public void moveObstacle(Obstacle obstacle){
-		BoardPosition prevPosition=obstacle.getPosition();
 		boolean placed=false;
 		while(!placed) {
 			BoardPosition pos=getRandomPosition();
-			if(!getCell(pos).isOcupied() && !getCell(pos).isOcupiedByGoal()) {
-				getCell(pos).setGameElement(obstacle);
-				obstacle.setPosition(pos);
-				getCell(prevPosition).removeObstacle();
-				placed=true;
+			if(getCell(pos).setGameElement(obstacle)) {
+					placed=true;
 			}
 		}
 	}
@@ -94,10 +98,8 @@ public abstract class Board extends Observable {
 		if(pos.y<NUM_ROWS-1)
 			possibleCells.add(pos.getCellBelow());
 		return possibleCells;
-
 	}
 
-	
 
 	protected Goal addGoal() {
 		Goal goal= Goal.getInstance(this); // uma só instância do goal
@@ -131,30 +133,42 @@ public abstract class Board extends Observable {
 		return obstacles;
 	}
 
-	
+
+	/**
+	 * métodos abstract implementados em {@link LocalBoard}.
+	 */
 	public abstract void init(); 
 	
 	public abstract void handleKeyPress(int keyCode);
 
 	public abstract void handleKeyRelease();
 	
-	
-	
 
 	public void addSnake(Snake snake) {
 		snakes.add(snake);
 	}
 
-	public void wakeLazySnakes() {
+	/**
+	 * Método vai ser chamado após clique no botão "reset snakes".
+	 * Interruperá todas as {@link AutomaticSnake}.
+	 * return: void
+	 */
+	public void wakeLazySnakes()  {
 		for (Snake s: snakes) {
-			if(s instanceof AutomaticSnake){
+			if(s instanceof AutomaticSnake)
 				s.interrupt();
-			}
+		}
+	}
+
+	public void interruptSnakes(){
+		for (Snake s:
+			 snakes) {
+			s.interrupt();
 		}
 	}
 
 	public void terminate() {
 		isFinished=true;
-		wakeLazySnakes();
+		interruptSnakes();
 	}
 }

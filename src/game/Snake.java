@@ -16,11 +16,12 @@ import environment.Cell;
  */
 public abstract class Snake extends Thread implements Serializable{
 	private static final int DELTA_SIZE = 10;
-	protected LinkedList<Cell> cells = new LinkedList<Cell>();	// células ocupadas pela snake
+	private LinkedList<Cell> cells = new LinkedList<Cell>();	// células ocupadas pela snake
 	protected int size = 5;
 	private int digestion = 0;
 	private int id;
 	private Board board;
+
 
 	public Snake(int id,Board board) {
 		this.id = id;
@@ -43,23 +44,36 @@ public abstract class Snake extends Thread implements Serializable{
 		return cells;
 	}
 
-	protected void move(Cell cell) throws InterruptedException {
-		// TODO fazer movimentação para a respetiva célula
-		cell.request(this); //request da ocupação da célula -> fica em espera se a célula estiver ocupada
-		cells.add(cell); //  request completo;  adicionar célula à cabeça da snake (movimentação)
-		if(digestion == 0){
-			Cell releaseCell = cells.removeFirst(); //se não comeu premio -> eliminar a ultima posição ocupada pela cobra
-			releaseCell.release(); //desocupar célula
-		} else {
-			digestion -= 1;
-		}
-		board.setChanged();
-
+	public void addCell(Cell cell){
+		cells.add(cell);
 	}
 
+	public void move(Cell cell) throws InterruptedException {
+		//request da ocupação da célula -> fica em espera se a célula estiver ocupada
+		if(cell.request(this)){
+			if(digestion == 0){
+				Cell releaseCell = cells.getFirst(); //se não comeu premio -> eliminar a ultima posição ocupada pela cobra
+				releaseCell.release(this); //desocupar célula
+			} else {
+				digestion -= 1;
+			}
+		}
+		board.setChanged();
+	}
+
+	public boolean isDigesting(){
+		return digestion > 0;
+	}
+
+	public void removeFirstCell(){
+		cells.removeFirst();
+	}
+
+	public Cell getFirstCell(){ return cells.getFirst(); }
 	public void eat(int goalValue){
 		digestion += goalValue;
 	}
+
 	
 	public LinkedList<BoardPosition> getPath() {
 		LinkedList<BoardPosition> coordinates = new LinkedList<>();
@@ -84,12 +98,6 @@ public abstract class Snake extends Thread implements Serializable{
 			}
 		}
 
-//		try {
-//			board.getCell(at).initialRequest(this);
-//		} catch (InterruptedException e1) {
-//			e1.printStackTrace();
-//		}
-
 		cells.add(board.getCell(at)); //adicionar primeira posição celular da snake à linkedlist
 		System.err.println("Snake "+getIdentification()+" starting at:"+getCells().getLast());		
 	}
@@ -97,6 +105,6 @@ public abstract class Snake extends Thread implements Serializable{
 	public Board getBoard() {
 		return board;
 	}
-	
-	
+
+
 }

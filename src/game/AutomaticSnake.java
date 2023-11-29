@@ -31,7 +31,7 @@ public class AutomaticSnake extends Snake {
 	@Override
 	public void run() {
 		doInitialPositioning();
-		System.err.println("initial size:"+cells.size());
+		System.err.println("initial size:" + getCells().size());
 
 		//TODO: automatic movement
 		while(true){
@@ -40,14 +40,14 @@ public class AutomaticSnake extends Snake {
 				move(nextCell); // Snake.move()
 				Thread.sleep(Board.PLAYER_PLAY_INTERVAL);
 			}catch (InterruptedException e){
-				if(getBoard().isFinished()){
+				if(getBoard().isFinished())
 					break;
-				}
-				System.out.println("Snake interrompida -> reset direção");
+//				System.out.println("Snake interrompida -> reset direção");
 				resetMove = true;
 			}
 		}
 	}
+
 
 	/**
 	 * <h3>getNextPosition</h3>
@@ -59,26 +59,28 @@ public class AutomaticSnake extends Snake {
 	 **/
 	private BoardPosition getNextPosition(){
 		BoardPosition goal = getBoard().getGoalPosition();
-		List<BoardPosition> options = getBoard().getNeighboringPositions(cells.getLast());
-		if(resetMove){ 	//snake interrupted -> excluir células com obstaculos
-			options.removeIf(p -> getBoard().getCell(p).isOcupied()); // (2)
-			resetMove = false;
-		}
+		List<BoardPosition> options = getBoard().getNeighboringPositions(getCells().getLast());
 
 		options.removeIf(i -> getPath().contains(i)); //(1)
-		BoardPosition ini = new BoardPosition(0,0);
-		BoardPosition end= new BoardPosition(Board.NUM_COLUMNS, Board.NUM_ROWS);
-
-		options.removeIf(i -> getPath().contains(i)); // options - getPath()
-		double min = ini.distanceTo(end);
 		BoardPosition bestOption = options.get(0); //inicializar com a primeira opção
 
-		for (BoardPosition p: options) {
-			double distance = p.distanceTo(goal); // (3)
-			if(distance < min){
-				min = distance;
-				bestOption = p;
+		if(resetMove){ 	//snake interrupted -> excluir células com obstaculos
+			options.removeIf(p -> getBoard().getCell(p).isOcupiedByObstacle()); // (2)
+			resetMove = false;
+		}
+		BoardPosition ini = new BoardPosition(0,0);
+		BoardPosition end= new BoardPosition(Board.NUM_COLUMNS, Board.NUM_ROWS);
+		double min = ini.distanceTo(end);
+
+		if(!options.isEmpty()){
+			for (BoardPosition p: options) {
+				double distance = p.distanceTo(goal); // (3)
+				if(distance < min){
+					min = distance;
+					bestOption = p;
+				}
 			}
+
 		}
 		return bestOption;
 	}

@@ -42,7 +42,7 @@ public class BoardComponent extends JComponent implements KeyListener{
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		final double CELL_WIDTH=getHeight()/(double)SnakeGui.NUM_ROWS;
-		System.err.println("W:"+getWidth()+" H:"+getHeight());
+//		System.err.println("W:"+getWidth()+" H:"+getHeight());
 		for (int x = 0; x < LocalBoard.NUM_COLUMNS; x++) {
 			for (int y = 0; y < LocalBoard.NUM_ROWS; y++) {
 				Cell cell = board.getCell(new BoardPosition(x, y));
@@ -115,13 +115,11 @@ public class BoardComponent extends JComponent implements KeyListener{
 	// releasing keys on the keyboard.
 	@Override
 	public void keyPressed(KeyEvent e) {
-		System.out.println("Got key pressed.");
+//		System.out.println("Got key pressed.");
 		if(e.getKeyCode()!=KeyEvent.VK_LEFT && e.getKeyCode()!=KeyEvent.VK_RIGHT && 
 				e.getKeyCode()!=KeyEvent.VK_UP && e.getKeyCode()!=KeyEvent.VK_DOWN ) 
 			return; // ignore
 		board.handleKeyPress(e.getKeyCode());
-		
-		
 	}
 
 	@Override
@@ -129,8 +127,7 @@ public class BoardComponent extends JComponent implements KeyListener{
 		if(e.getKeyCode()!=KeyEvent.VK_LEFT && e.getKeyCode()!=KeyEvent.VK_RIGHT && 
 				e.getKeyCode()!=KeyEvent.VK_UP && e.getKeyCode()!=KeyEvent.VK_DOWN ) 
 			return; // ignore
-
-		System.out.println("Got key released.");
+//		System.out.println("Got key released.");
 		board.handleKeyRelease();
 	}
 
