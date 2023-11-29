@@ -4,10 +4,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
-import game.GameElement;
-import game.Goal;
-import game.Obstacle;
-import game.Snake;
+import game.*;
 
 /** Main class for game representation.
  * 
@@ -34,10 +31,14 @@ public class Cell {
 		return position;
 	}
 
-	public void request(Snake snake) throws InterruptedException {
+	public boolean request(Snake snake) throws InterruptedException {
 		//TODO coordination and mutual exclusion
 		lock.lock();
-		try{
+
+		if(snake instanceof HumanSnake && isOcupied()){
+			lock.unlock();
+			return false;
+		}else{
 			while(isOcupied()){
 				free.await();
 			}
@@ -49,9 +50,9 @@ public class Cell {
 				gameElement = null;
 				goal.relocateGoal();
 			}
-		} finally {
-			lock.unlock();
 		}
+		lock.unlock();
+		return true;
 	}
 
 	public boolean initialRequest(Snake snake){

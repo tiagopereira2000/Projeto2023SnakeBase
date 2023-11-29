@@ -2,6 +2,8 @@ package environment;
 
 import game.*;
 
+import java.awt.event.KeyEvent;
+
 /** Class representing the state of a game running locally
  * 
  * @author luismota
@@ -13,20 +15,15 @@ public class LocalBoard extends Board{
 	private static final int NUM_OBSTACLES = 20;
 	private static final int NUM_SIMULTANEOUS_MOVING_OBSTACLES = 3;
 	private static ThreadPool pool = new ThreadPool(NUM_SIMULTANEOUS_MOVING_OBSTACLES);
+	private static HumanSnake mySnake;
 	
 
 	public LocalBoard() {
-		for (int i = 0; i < NUM_SNAKES; i++) {
-			AutomaticSnake snake = new AutomaticSnake(i, this);
-			snakes.add(snake);
-		}
+		//threadpool já instanciada. sendo estática
+ 		createSnakes();
 		addObstacles(NUM_OBSTACLES);
-		for(Obstacle o: getObstacles()){
-			ObstacleMover obsMov = new ObstacleMover(o,this);
-			pool.submit(obsMov);
-		}
-
-		Goal goal = addGoal();
+		submitObstacleMovers();
+		addGoal();
 	}
 
 	public void init() {
@@ -36,11 +33,25 @@ public class LocalBoard extends Board{
 		setChanged();
 	}
 
-	
+	public void createSnakes(){
+		mySnake = new HumanSnake(NUM_SNAKES +1, this);
+		addSnake(mySnake);
+		for (int i = 0; i < NUM_SNAKES; i++) {
+			AutomaticSnake snake = new AutomaticSnake(i, this);
+			addSnake(snake);
+		}
+	}
+
+	public void submitObstacleMovers(){
+		for(Obstacle o: getObstacles()){
+			ObstacleMover obsMov = new ObstacleMover(o,this);
+			pool.submit(obsMov);
+		}
+	}
 
 	@Override
 	public void handleKeyPress(int keyCode) {
-		// do nothing... No keys relevant in local game
+		mySnake.setNextMoveCode(keyCode);	// ERROR: handle KeyPress not focused on window
 	}
 
 	@Override
@@ -48,6 +59,10 @@ public class LocalBoard extends Board{
 		// do nothing... No keys relevant in local game
 	}
 
+	/**
+	 * Passa a Board.isFinished para true e interrompe todas as snakes,
+	 * começando pelas {@link AutomaticSnake} e depois interrompe
+	 */
 	@Override
 	public void terminate() {
 		super.terminate();

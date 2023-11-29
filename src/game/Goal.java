@@ -15,10 +15,8 @@ public class Goal extends GameElement {
 		this.board = board2;
 		goalThread = new Thread(() -> {
 			try {
-				Thread.sleep((MAX_VALUE-1) * 100);
-			}catch (InterruptedException ignored){
-
-			}
+				Thread.sleep((MAX_VALUE-1) * Board.PLAYER_PLAY_INTERVAL);
+			}catch (InterruptedException ignored){}
 			board.terminate();
 		});
 	}

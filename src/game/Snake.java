@@ -16,7 +16,7 @@ import environment.Cell;
  */
 public abstract class Snake extends Thread implements Serializable{
 	private static final int DELTA_SIZE = 10;
-	protected LinkedList<Cell> cells = new LinkedList<Cell>();	// células ocupadas pela snake
+	private LinkedList<Cell> cells = new LinkedList<Cell>();	// células ocupadas pela snake
 	protected int size = 5;
 	private int digestion = 0;
 	private int id;
@@ -48,13 +48,15 @@ public abstract class Snake extends Thread implements Serializable{
 		cells.add(cell);
 	}
 
-	protected void move(Cell cell) throws InterruptedException {
-		cell.request(this); //request da ocupação da célula -> fica em espera se a célula estiver ocupada
-		if(digestion == 0){
-			Cell releaseCell = cells.getFirst(); //se não comeu premio -> eliminar a ultima posição ocupada pela cobra
-			releaseCell.release(this); //desocupar célula
-		} else {
-			digestion -= 1;
+	public void move(Cell cell) throws InterruptedException {
+		//request da ocupação da célula -> fica em espera se a célula estiver ocupada
+		if(cell.request(this)){
+			if(digestion == 0){
+				Cell releaseCell = cells.getFirst(); //se não comeu premio -> eliminar a ultima posição ocupada pela cobra
+				releaseCell.release(this); //desocupar célula
+			} else {
+				digestion -= 1;
+			}
 		}
 		board.setChanged();
 	}
@@ -67,6 +69,7 @@ public abstract class Snake extends Thread implements Serializable{
 		cells.removeFirst();
 	}
 
+	public Cell getFirstCell(){ return cells.getFirst(); }
 	public void eat(int goalValue){
 		digestion += goalValue;
 	}
@@ -102,6 +105,6 @@ public abstract class Snake extends Thread implements Serializable{
 	public Board getBoard() {
 		return board;
 	}
-	
-	
+
+
 }

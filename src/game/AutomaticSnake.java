@@ -31,7 +31,7 @@ public class AutomaticSnake extends Snake {
 	@Override
 	public void run() {
 		doInitialPositioning();
-		System.err.println("initial size:"+cells.size());
+		System.err.println("initial size:" + getCells().size());
 
 		//TODO: automatic movement
 		while(true){
@@ -42,11 +42,12 @@ public class AutomaticSnake extends Snake {
 			}catch (InterruptedException e){
 				if(getBoard().isFinished())
 					break;
-				System.out.println("Snake interrompida -> reset direção");
+//				System.out.println("Snake interrompida -> reset direção");
 				resetMove = true;
 			}
 		}
 	}
+
 
 	/**
 	 * <h3>getNextPosition</h3>
@@ -58,7 +59,7 @@ public class AutomaticSnake extends Snake {
 	 **/
 	private BoardPosition getNextPosition(){
 		BoardPosition goal = getBoard().getGoalPosition();
-		List<BoardPosition> options = getBoard().getNeighboringPositions(cells.getLast());
+		List<BoardPosition> options = getBoard().getNeighboringPositions(getCells().getLast());
 
 		options.removeIf(i -> getPath().contains(i)); //(1)
 		BoardPosition bestOption = options.get(0); //inicializar com a primeira opção

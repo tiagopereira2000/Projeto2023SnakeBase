@@ -12,7 +12,7 @@ import game.*;
 public abstract class Board extends Observable {
 	protected Cell[][] cells;
 	private BoardPosition goalPosition;
-	public static final long PLAYER_PLAY_INTERVAL = 100;
+	public static final long PLAYER_PLAY_INTERVAL = 150;
 	public static final long REMOTE_REFRESH_INTERVAL = 200;
 	public static final int NUM_COLUMNS = 30;
 	public static final int NUM_ROWS = 30;
@@ -40,6 +40,12 @@ public abstract class Board extends Observable {
 		return cells[cellCoord.x][cellCoord.y];
 	}
 
+	public boolean isOutOfBounds(BoardPosition p){
+		if (p.x >= NUM_COLUMNS || p.x < 0 || p.y >= NUM_ROWS || p.y < 0)
+			return true;
+		return false;
+	}
+
 	protected BoardPosition getRandomPosition() {
 		return new BoardPosition((int) (Math.random() *NUM_COLUMNS),(int) (Math.random() * NUM_ROWS));
 	}
@@ -65,13 +71,16 @@ public abstract class Board extends Observable {
 		}
 	}
 
+	/**
+	 * Implementado da mesma forma que addGameElement.
+	 * Não tendo em conta elementos do tipo Goal.
+	 * @param obstacle
+	 */
 	public void moveObstacle(Obstacle obstacle){
-		BoardPosition prevPosition=obstacle.getPosition();
 		boolean placed=false;
 		while(!placed) {
 			BoardPosition pos=getRandomPosition();
 			if(getCell(pos).setGameElement(obstacle)) {
-					getCell(prevPosition).removeObstacle();
 					placed=true;
 			}
 		}
@@ -124,7 +133,10 @@ public abstract class Board extends Observable {
 		return obstacles;
 	}
 
-	
+
+	/**
+	 * métodos abstract implementados em {@link LocalBoard}.
+	 */
 	public abstract void init(); 
 	
 	public abstract void handleKeyPress(int keyCode);
@@ -136,14 +148,27 @@ public abstract class Board extends Observable {
 		snakes.add(snake);
 	}
 
+	/**
+	 * Método vai ser chamado após clique no botão "reset snakes".
+	 * Interruperá todas as {@link AutomaticSnake}.
+	 * return: void
+	 */
 	public void wakeLazySnakes()  {
 		for (Snake s: snakes) {
+			if(s instanceof AutomaticSnake)
+				s.interrupt();
+		}
+	}
+
+	public void interruptSnakes(){
+		for (Snake s:
+			 snakes) {
 			s.interrupt();
 		}
 	}
 
 	public void terminate() {
 		isFinished=true;
-		wakeLazySnakes(); // TODO deixar a cobra crescer depois do comer o 9º prémio
+		interruptSnakes();
 	}
 }
