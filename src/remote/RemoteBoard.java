@@ -20,7 +20,10 @@ import game.Snake;
  *
  */
 public class RemoteBoard extends Board{
-	
+	public RemoteBoard() {
+
+	}
+
 	@Override
 	public void handleKeyPress(int keyCode) {
 		//TODO O cliente vai pressionar uma tecla e vai enviá-la para o servidor realizar o seu movimento
