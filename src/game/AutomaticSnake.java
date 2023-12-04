@@ -1,5 +1,6 @@
 package game;
 
+import java.io.Serializable;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -13,7 +14,7 @@ import environment.Board;
 import environment.BoardPosition;
 
 
-public class AutomaticSnake extends Snake {
+public class AutomaticSnake extends Snake implements Serializable {
 	protected boolean resetMove = false; //se a snake tiver sido interrompida para adotar outro caminho
 	public AutomaticSnake(int id, LocalBoard board) {
 		super(id,board);

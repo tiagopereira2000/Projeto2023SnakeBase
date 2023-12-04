@@ -1,5 +1,6 @@
 package environment;
 
+import java.io.Serializable;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
@@ -11,7 +12,7 @@ import game.*;
  * @author luismota
  *
  */
-public class Cell {
+public class Cell implements Serializable {
 	private BoardPosition position;
 	private Snake ocuppyingSnake = null;
 	private GameElement gameElement=null;

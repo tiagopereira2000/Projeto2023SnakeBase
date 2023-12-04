@@ -3,7 +3,9 @@ package game;
 
 import environment.BoardPosition;
 
-public abstract class GameElement{
+import java.io.Serializable;
+
+public abstract class GameElement implements Serializable {
     private BoardPosition position;
 
     public BoardPosition getPosition() {

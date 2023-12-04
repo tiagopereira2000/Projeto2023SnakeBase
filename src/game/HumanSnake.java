@@ -3,18 +3,20 @@ package game;
 import environment.Board;
 import environment.BoardPosition;
 import environment.Cell;
+import remote.Server;
 
 import java.awt.event.KeyEvent;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.io.IOException;
+import java.io.Serializable;
 
 /** Class for a remote snake, controlled by a human
   * 
   * @author luismota
   *
   */
-public class HumanSnake extends Snake {
-	private AtomicInteger nextMoveCode = new AtomicInteger(KeyEvent.VK_RIGHT); //default
-	public HumanSnake(int id,Board board) {
+public class HumanSnake extends Snake implements Serializable {
+	private int nextMoveCode = 0; //default
+	public HumanSnake(int id, Board board) {
 		super(id,board);
 	}
 
@@ -30,15 +32,16 @@ public class HumanSnake extends Snake {
 	@Override
 	 public void run() {
 		 doInitialPositioning();
+
 		 while (true){
 			 try {
-				 int keyCode = nextMoveCode.get();
+				 int keyCode = nextMoveCode;
 				 readMovement(keyCode);
 				 Thread.sleep(Board.PLAYER_PLAY_INTERVAL);
 			 } catch (InterruptedException e) {
 				 System.out.println("Interrupoted Human");
 				 if(getBoard().isFinished())
-				 	break;
+					 break;
 			 }
 		 }
 	 }
@@ -50,7 +53,7 @@ public class HumanSnake extends Snake {
 	 * @param keyCode
 	 */
 	public void setNextMoveCode(int keyCode) {
-		nextMoveCode.set(keyCode);
+		nextMoveCode = keyCode;
 	}
 
 	/**
@@ -74,6 +77,7 @@ public class HumanSnake extends Snake {
 		} else if (key == KeyEvent.VK_DOWN){
 			nextPosition = nextPosition.getCellBelow();
 		} else {
+//			System.out.println("nada");
 			return; //se key for 0 neste caso sai do readmovemnt
 		}
 

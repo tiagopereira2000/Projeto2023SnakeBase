@@ -9,7 +9,7 @@ import java.util.Observable;
 import game.*;
 //import jdk.vm.ci.meta.Local;
 
-public abstract class Board extends Observable {
+public abstract class Board extends Observable implements Serializable{
 	protected Cell[][] cells;
 	private BoardPosition goalPosition;
 	public static final long PLAYER_PLAY_INTERVAL = 150;
@@ -20,7 +20,9 @@ public abstract class Board extends Observable {
 	private LinkedList<Obstacle> obstacles = new LinkedList<>();
 	protected boolean isFinished = false;
 
-
+	public Cell[][] getCells() {
+		return cells;
+	}
 
 	public Board() {
 		cells = new Cell[NUM_COLUMNS][NUM_ROWS];

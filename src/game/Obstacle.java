@@ -3,7 +3,9 @@ package game;
 import environment.Board;
 import environment.BoardPosition;
 
-public class Obstacle extends GameElement {
+import java.io.Serializable;
+
+public class Obstacle extends GameElement implements Serializable {
 	
 	
 	private static final int NUM_MOVES=3;

@@ -5,7 +5,9 @@ import environment.BoardPosition;
 import environment.Cell;
 import environment.LocalBoard;
 
-public class Goal extends GameElement {
+import java.io.Serializable;
+
+public class Goal extends GameElement implements Serializable {
 	private static Goal instance;
 	private int value=1;
 	private Board board;
