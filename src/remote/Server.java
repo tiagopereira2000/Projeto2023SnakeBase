@@ -9,8 +9,10 @@ import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -20,40 +22,58 @@ public class Server{
     private int idCount = LocalBoard.NUM_SNAKES; //1st client id
     private ArrayList<ObjectOutputStream> outputStreams;
 
-    private Thread multicastGameState = new Thread( () -> {
-        while(outputStreams.isEmpty()){
-            try {
-                synchronized (outputStreams){
-                    outputStreams.wait();
-                }
-            } catch (InterruptedException ignored) {}
-        }
+    private ReentrantLock svLock = new ReentrantLock();
+    private Condition outsEmpty = svLock.newCondition();
 
-        while (!outputStreams.isEmpty()){
-            for (ObjectOutputStream o: outputStreams) {
-                try{
-                    o.writeObject(gameState);
-                    o.flush();
-                } catch (IOException e) {
-                    System.out.println("o.writeObject() throws IOEx");
-                }finally {
-                    outputStreams.remove(o);
-                    try {
-                        o.close();
-                    } catch (IOException ignored) {
-                        System.out.println("o.close() throws IOEx");
-                    }
+
+
+    private Thread multicastGameState = new Thread( () -> {
+        System.out.println("Multicast iniciado!");
+            svLock.lock();
+            while(outputStreams.isEmpty()) {
+
+                try {
+                    outsEmpty.await();
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
                 }
-            } //end foreach
-            try{
-                Thread.sleep(Board.REMOTE_REFRESH_INTERVAL);
-            }catch (InterruptedException e){
-                System.out.println("terminating game");
-                gameState.terminate();
-                break;
+
             }
-        } //end while
-    });
+            svLock.unlock();
+
+
+            while (true){
+                svLock.lock();
+                for (ObjectOutputStream o: outputStreams) {
+                    try{
+                        o.writeObject(gameState);
+
+                        o.flush();
+                        o.reset();
+                    } catch (IOException e) {
+                        System.out.println("o.writeObject() throws IOEx");
+
+                        try {
+                            o.close();
+                        } catch (IOException ignored) {
+                            System.out.println("o.close() throws IOEx");
+                        }
+                    }
+                } //end foreach
+                try{
+                    svLock.unlock();
+                    Thread.sleep(Board.REMOTE_REFRESH_INTERVAL);
+                }catch (InterruptedException e){
+                    System.out.println("terminating game");
+                    gameState.terminate();
+                    break; //break while
+                }
+        }//end while
+
+
+     //end while
+    }
+    );
 
     public Server(Board gameState) {
         this.gameState = gameState;
@@ -86,10 +106,13 @@ public class Server{
         void doConnections(Socket socket) throws IOException {
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             out = new ObjectOutputStream(socket.getOutputStream());
-            synchronized (outputStreams){
-                outputStreams.add(out);
-                outputStreams.notify();
-            }
+            svLock.lock();
+            outputStreams.add(out);
+            outsEmpty.signalAll();
+            svLock.unlock();
+
+
+
         }
 
         void initializeSnake() throws IOException {
@@ -104,7 +127,6 @@ public class Server{
                 try {
                     humanSnake.setNextMoveCode(Integer.parseInt(in.readLine()));
                 }catch (IOException e){
-                }finally {
                     in.close();
                     break;
                 }

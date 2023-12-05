@@ -44,8 +44,12 @@ public class Client {
 	private void readGameState() throws IOException, ClassNotFoundException, InterruptedException {
 		while(true){
 			myBoard = (Board) in.readObject();
+			System.out.println(myBoard.getSnakes().toString());
 			System.out.println("received gamestate");
+			myBoard.addObserver(game);
 			myBoard.setChanged();
+
+
 			Thread.sleep(Board.REMOTE_REFRESH_INTERVAL);
 		}
 	}

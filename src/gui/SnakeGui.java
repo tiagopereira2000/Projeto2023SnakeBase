@@ -30,7 +30,11 @@ public class SnakeGui implements Observer {
 	private BoardComponent boardGui;
 	private Board board;
 
-	public SnakeGui(Board board, int x,int y) {
+	public BoardComponent getBoardGui() {
+		return boardGui;
+	}
+
+	public SnakeGui(Board board, int x, int y) {
 		super();
 		this.board=board;
 		frame= new JFrame("The Snake Game: "+(board instanceof LocalBoard?"Local":"Remote"));
@@ -70,7 +74,8 @@ public class SnakeGui implements Observer {
 	}
 
 	@Override
-	public void update(Observable o, Object arg) {
-		boardGui.repaint();
-	}
+		public void update(Observable o, Object arg) {
+			System.out.println("SnakeGUI UPDATED");
+			boardGui.repaint();
+		}
 }

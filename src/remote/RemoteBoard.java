@@ -9,7 +9,7 @@ import environment.Cell;
  * @author luismota
  *
  */
-public class RemoteBoard extends Board {
+public class RemoteBoard extends Board{
 	Client client;
 	public RemoteBoard(Client client) {
 		this.client = client;
@@ -30,7 +30,7 @@ public class RemoteBoard extends Board {
 	public void init() {
 		// faz um pedido de inserção do player na board do servidor
 		client.requestSnake();
-		setChanged();
+		//setChanged();
 	}
 
 //	public void setGameState(Cell[][] state){
