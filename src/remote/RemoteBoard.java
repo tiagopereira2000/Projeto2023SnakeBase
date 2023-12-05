@@ -9,7 +9,7 @@ import environment.Cell;
  * @author luismota
  *
  */
-public class RemoteBoard extends Board {
+public class RemoteBoard extends Board{
 	Client client;
 	public RemoteBoard(Client client) {
 		this.client = client;
