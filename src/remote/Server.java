@@ -47,8 +47,9 @@ public class Server{
                 for (ObjectOutputStream o: outputStreams) {
                     try{
                         o.writeObject(gameState);
-                        //o.refresh();
+
                         o.flush();
+                        o.reset();
                     } catch (IOException e) {
                         System.out.println("o.writeObject() throws IOEx");
 

@@ -46,8 +46,9 @@ public class Client {
 			myBoard = (Board) in.readObject();
 			System.out.println(myBoard.getSnakes().toString());
 			System.out.println("received gamestate");
+			myBoard.addObserver(game);
 			myBoard.setChanged();
-			game.getBoardGui().repaint();
+
 
 			Thread.sleep(Board.REMOTE_REFRESH_INTERVAL);
 		}

@@ -30,7 +30,7 @@ public class RemoteBoard extends Board{
 	public void init() {
 		// faz um pedido de inserção do player na board do servidor
 		client.requestSnake();
-		setChanged();
+		//setChanged();
 	}
 
 //	public void setGameState(Cell[][] state){
