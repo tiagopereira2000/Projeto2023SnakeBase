@@ -12,7 +12,7 @@ import game.*;
 public abstract class Board extends Observable implements Serializable{
 	protected Cell[][] cells;
 	private BoardPosition goalPosition;
-	public static final long PLAYER_PLAY_INTERVAL = 150;
+	public static final long PLAYER_PLAY_INTERVAL = 200;
 	public static final long REMOTE_REFRESH_INTERVAL = 200;
 	public static final int NUM_COLUMNS = 30;
 	public static final int NUM_ROWS = 30;
@@ -131,10 +131,18 @@ public abstract class Board extends Observable implements Serializable{
 		notifyObservers();
 	}
 
+
 	public LinkedList<Obstacle> getObstacles() {
 		return obstacles;
 	}
 
+	public void setSnakes(LinkedList<Snake> snakes) {
+		this.snakes = snakes;
+	}
+
+	public void setCells(Cell[][] cells) {
+		this.cells = cells;
+	}
 
 	/**
 	 * métodos abstract implementados em {@link LocalBoard}.

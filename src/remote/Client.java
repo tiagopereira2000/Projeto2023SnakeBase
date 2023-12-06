@@ -4,10 +4,12 @@ package remote;
 import environment.Board;
 import gui.SnakeGui;
 
+import javax.sound.sampled.Port;
 import java.io.*;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.io.IOException;
+import java.net.UnknownHostException;
 
 /** Remore client, only for part II
  * 
@@ -21,8 +23,12 @@ public class Client {
 	private ObjectInputStream in; //game state in
 	private PrintWriter out; //integer out
 	private Socket socket;
+	private InetAddress address;
+	private final int port;
 
-	public Client() {
+	public Client(String addr, String port) throws UnknownHostException {
+		address = InetAddress.getByName(addr);
+		this.port = Integer.parseInt(port);
 		myBoard = new RemoteBoard(this);
 		game = new SnakeGui(myBoard,600,0);
 	}
@@ -43,22 +49,20 @@ public class Client {
 
 	private void readGameState() throws IOException, ClassNotFoundException, InterruptedException {
 		while(true){
-			myBoard = (Board) in.readObject();
-			System.out.println(myBoard.getSnakes().toString());
-			System.out.println("received gamestate");
-			myBoard.addObserver(game);
+			Board serverBoard = (Board) in.readObject();
+			myBoard.setCells(serverBoard.getCells());
+			myBoard.setSnakes(serverBoard.getSnakes());
 			myBoard.setChanged();
 
-
-			Thread.sleep(Board.REMOTE_REFRESH_INTERVAL);
+			if(serverBoard.isFinished()) break;
 		}
 	}
 
 
 	void connectToServer() throws IOException {
-			InetAddress endereco = InetAddress.getByName(null);
-			System.out.println("Endereco:" + endereco);
-			socket = new Socket(endereco, Server.PORTO);
+//			InetAddress endereco = InetAddress.getByName(null);
+			System.out.println("Endereco:" + address);
+			socket = new Socket(address, port);
 			System.out.println("Socket:" + socket);
 			in = new ObjectInputStream(socket.getInputStream());
 			out = new PrintWriter(
@@ -75,8 +79,8 @@ public class Client {
 		out.println(0);
 	}
 
-	public static void main(String[] args) {
-		Client client = new Client();
+	public static void main(String[] args) throws UnknownHostException {
+		Client client = new Client(args[0],args[1]);
 		client.runClient();
 	}
 

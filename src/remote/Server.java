@@ -31,7 +31,6 @@ public class Server{
         System.out.println("Multicast iniciado!");
             svLock.lock();
             while(outputStreams.isEmpty()) {
-
                 try {
                     outsEmpty.await();
                 } catch (InterruptedException e) {
@@ -41,27 +40,23 @@ public class Server{
             }
             svLock.unlock();
 
-
             while (true){
                 svLock.lock();
-                for (ObjectOutputStream o: outputStreams) {
+                ArrayList<ObjectOutputStream> streamsCopy = outputStreams;
+                svLock.unlock();
+                for (ObjectOutputStream o: streamsCopy) {
                     try{
                         o.writeObject(gameState);
-
                         o.flush();
                         o.reset();
                     } catch (IOException e) {
                         System.out.println("o.writeObject() throws IOEx");
-
-                        try {
-                            o.close();
-                        } catch (IOException ignored) {
-                            System.out.println("o.close() throws IOEx");
-                        }
+                        svLock.lock();
+                        outputStreams.remove(o);
+                        svLock.unlock();
                     }
                 } //end foreach
                 try{
-                    svLock.unlock();
                     Thread.sleep(Board.REMOTE_REFRESH_INTERVAL);
                 }catch (InterruptedException e){
                     System.out.println("terminating game");
@@ -97,7 +92,7 @@ public class Server{
                 serve();
 
             } catch (IOException e) {
-                throw new RuntimeException(e);
+//                throw new RuntimeException(e);
             }
 
 
@@ -110,9 +105,6 @@ public class Server{
             outputStreams.add(out);
             outsEmpty.signalAll();
             svLock.unlock();
-
-
-
         }
 
         void initializeSnake() throws IOException {
@@ -138,6 +130,7 @@ public class Server{
 
     public void startServing() throws IOException {
         ServerSocket ss = new ServerSocket(PORTO);
+        gameState.init();
         try {
             multicastGameState.start();
             while (true) {
@@ -164,9 +157,9 @@ public class Server{
      */
     public static void main(String[] args) throws IOException {
         LocalBoard board = new LocalBoard();
-        SnakeGui game = new SnakeGui(board, 200,0);
+//        SnakeGui game = new SnakeGui(board, 200,0);
         Server server = new Server(board);
-        game.init();
+//        game.init();
         server.startServing();
     }
     
