@@ -21,59 +21,9 @@ public class Server{
     private Board board;
     public static final int PORTO = 8888;
     private int idCount = LocalBoard.NUM_SNAKES; //1st client id
-//    private ArrayList<ObjectOutputStream> outputStreams;
-//
-//    private ReentrantLock svLock = new ReentrantLock();
-//    private Condition outsEmpty = svLock.newCondition();
-//
-//
-//
-//    private Thread multicastGameState = new Thread( () -> {
-//        System.out.println("Multicast iniciado!");
-//            svLock.lock();
-//            while(outputStreams.isEmpty()) {
-//                try {
-//                    outsEmpty.await();
-//                } catch (InterruptedException e) {
-//                    throw new RuntimeException(e);
-//                }
-//
-//            }
-//            svLock.unlock();
-//
-//            while (!outputStreams.isEmpty()){
-//                GameState gameState = new GameState(board.getCells(),
-//                        board.getSnakes(),
-//                        board.isFinished());
-//                svLock.lock();
-//                ArrayList<ObjectOutputStream> streamsCopy = outputStreams;
-//                svLock.unlock();
-//                for (ObjectOutputStream o: streamsCopy) {
-//                    try{
-//                        o.writeObject(gameState);
-//                        o.flush();
-//                        o.reset();
-//                    } catch (IOException e) {
-//                        System.out.println("o.writeObject() throws IOEx");
-//                        svLock.lock();
-//                        outputStreams.remove(o);
-//                        svLock.unlock();
-//                    }
-//                } //end foreach
-//                try{
-//                    Thread.sleep(Board.REMOTE_REFRESH_INTERVAL);
-//                }catch (InterruptedException e){
-//                    System.out.println("terminating game");
-//                    board.terminate();
-//                    break; //break while
-//                }
-//        }//end while
-//
-//    });
 
     public Server(Board gameState) {
         this.board = gameState;
-//        outputStreams = new ArrayList<>();
     }
 
     public class ClientHandler extends Thread {
@@ -103,10 +53,6 @@ public class Server{
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             out = new ObjectOutputStream(socket.getOutputStream());
             new SendStateMulticast(board, out).start();
-//            svLock.lock();
-//            outputStreams.add(out);
-//            outsEmpty.signalAll();
-//            svLock.unlock();
         }
 
         void initializeSnake() throws IOException {
