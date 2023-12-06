@@ -1,6 +1,7 @@
 package remote;
 
 import environment.Board;
+import environment.GameState;
 import environment.LocalBoard;
 import game.HumanSnake;
 import gui.SnakeGui;
@@ -17,62 +18,62 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class Server{
-    private Board gameState;
-    public static final int PORTO = 8080;
+    private Board board;
+    public static final int PORTO = 8888;
     private int idCount = LocalBoard.NUM_SNAKES; //1st client id
-    private ArrayList<ObjectOutputStream> outputStreams;
-
-    private ReentrantLock svLock = new ReentrantLock();
-    private Condition outsEmpty = svLock.newCondition();
-
-
-
-    private Thread multicastGameState = new Thread( () -> {
-        System.out.println("Multicast iniciado!");
-            svLock.lock();
-            while(outputStreams.isEmpty()) {
-                try {
-                    outsEmpty.await();
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
-
-            }
-            svLock.unlock();
-
-            while (true){
-                svLock.lock();
-                ArrayList<ObjectOutputStream> streamsCopy = outputStreams;
-                svLock.unlock();
-                for (ObjectOutputStream o: streamsCopy) {
-                    try{
-                        o.writeObject(gameState);
-                        o.flush();
-                        o.reset();
-                    } catch (IOException e) {
-                        System.out.println("o.writeObject() throws IOEx");
-                        svLock.lock();
-                        outputStreams.remove(o);
-                        svLock.unlock();
-                    }
-                } //end foreach
-                try{
-                    Thread.sleep(Board.REMOTE_REFRESH_INTERVAL);
-                }catch (InterruptedException e){
-                    System.out.println("terminating game");
-                    gameState.terminate();
-                    break; //break while
-                }
-        }//end while
-
-
-     //end while
-    }
-    );
+//    private ArrayList<ObjectOutputStream> outputStreams;
+//
+//    private ReentrantLock svLock = new ReentrantLock();
+//    private Condition outsEmpty = svLock.newCondition();
+//
+//
+//
+//    private Thread multicastGameState = new Thread( () -> {
+//        System.out.println("Multicast iniciado!");
+//            svLock.lock();
+//            while(outputStreams.isEmpty()) {
+//                try {
+//                    outsEmpty.await();
+//                } catch (InterruptedException e) {
+//                    throw new RuntimeException(e);
+//                }
+//
+//            }
+//            svLock.unlock();
+//
+//            while (!outputStreams.isEmpty()){
+//                GameState gameState = new GameState(board.getCells(),
+//                        board.getSnakes(),
+//                        board.isFinished());
+//                svLock.lock();
+//                ArrayList<ObjectOutputStream> streamsCopy = outputStreams;
+//                svLock.unlock();
+//                for (ObjectOutputStream o: streamsCopy) {
+//                    try{
+//                        o.writeObject(gameState);
+//                        o.flush();
+//                        o.reset();
+//                    } catch (IOException e) {
+//                        System.out.println("o.writeObject() throws IOEx");
+//                        svLock.lock();
+//                        outputStreams.remove(o);
+//                        svLock.unlock();
+//                    }
+//                } //end foreach
+//                try{
+//                    Thread.sleep(Board.REMOTE_REFRESH_INTERVAL);
+//                }catch (InterruptedException e){
+//                    System.out.println("terminating game");
+//                    board.terminate();
+//                    break; //break while
+//                }
+//        }//end while
+//
+//    });
 
     public Server(Board gameState) {
-        this.gameState = gameState;
-        outputStreams = new ArrayList<>();
+        this.board = gameState;
+//        outputStreams = new ArrayList<>();
     }
 
     public class ClientHandler extends Thread {
@@ -101,16 +102,17 @@ public class Server{
         void doConnections(Socket socket) throws IOException {
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             out = new ObjectOutputStream(socket.getOutputStream());
-            svLock.lock();
-            outputStreams.add(out);
-            outsEmpty.signalAll();
-            svLock.unlock();
+            new SendStateMulticast(board, out).start();
+//            svLock.lock();
+//            outputStreams.add(out);
+//            outsEmpty.signalAll();
+//            svLock.unlock();
         }
 
         void initializeSnake() throws IOException {
             idCount++; // itera o contador de ids de snakes
-            humanSnake = new HumanSnake(idCount, gameState);
-            gameState.addSnake(humanSnake);
+            humanSnake = new HumanSnake(idCount, board);
+            board.addSnake(humanSnake);
             humanSnake.start();
         }
 
@@ -130,9 +132,8 @@ public class Server{
 
     public void startServing() throws IOException {
         ServerSocket ss = new ServerSocket(PORTO);
-        gameState.init();
+        board.init();
         try {
-            multicastGameState.start();
             while (true) {
                 Socket socket = ss.accept(); //acept connection with client
                 ClientHandler clienteSock = new ClientHandler(socket); //generate new handler for client
@@ -157,9 +158,7 @@ public class Server{
      */
     public static void main(String[] args) throws IOException {
         LocalBoard board = new LocalBoard();
-//        SnakeGui game = new SnakeGui(board, 200,0);
         Server server = new Server(board);
-//        game.init();
         server.startServing();
     }
     

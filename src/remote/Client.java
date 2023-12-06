@@ -2,6 +2,7 @@ package remote;
 
 
 import environment.Board;
+import environment.GameState;
 import gui.SnakeGui;
 
 import javax.sound.sampled.Port;
@@ -17,7 +18,7 @@ import java.net.UnknownHostException;
  *
  */
 
-public class Client {
+public class Client extends Thread{
 	private Board myBoard;
 	private SnakeGui game;
 	private ObjectInputStream in; //game state in
@@ -33,7 +34,7 @@ public class Client {
 		game = new SnakeGui(myBoard,600,0);
 	}
 
-	public void runClient() {
+	public void run() {
 		try {
 			connectToServer();
 			game.init();
@@ -49,18 +50,16 @@ public class Client {
 
 	private void readGameState() throws IOException, ClassNotFoundException, InterruptedException {
 		while(true){
-			Board serverBoard = (Board) in.readObject();
-			myBoard.setCells(serverBoard.getCells());
-			myBoard.setSnakes(serverBoard.getSnakes());
+			GameState gameState = (GameState) in.readObject();
+			if(gameState.isFinished()) break;
+			myBoard.setCells(gameState.getCells());
+			myBoard.setSnakes(gameState.getSnakes());
 			myBoard.setChanged();
-
-			if(serverBoard.isFinished()) break;
 		}
 	}
 
 
 	void connectToServer() throws IOException {
-//			InetAddress endereco = InetAddress.getByName(null);
 			System.out.println("Endereco:" + address);
 			socket = new Socket(address, port);
 			System.out.println("Socket:" + socket);
@@ -81,7 +80,7 @@ public class Client {
 
 	public static void main(String[] args) throws UnknownHostException {
 		Client client = new Client(args[0],args[1]);
-		client.runClient();
+		client.start();
 	}
 
 }
