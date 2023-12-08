@@ -3,18 +3,15 @@ package game;
 import environment.Board;
 import environment.BoardPosition;
 import environment.Cell;
-import remote.Server;
 
 import java.awt.event.KeyEvent;
-import java.io.IOException;
-import java.io.Serializable;
 
 /** Class for a remote snake, controlled by a human
   * 
   * @author luismota
   *
   */
-public class HumanSnake extends Snake implements Serializable {
+public class HumanSnake extends Snake {
 	private int nextMoveCode = 0; //default
 	public HumanSnake(int id, Board board) {
 		super(id,board);
@@ -23,7 +20,7 @@ public class HumanSnake extends Snake implements Serializable {
 	/**
 	 * Tarefa da thread de {@link HumanSnake}
 	 * Esta thread estará a correr do Lado do {@link remote.Server}.
-	 * realiza a sua posição inicial na {@link Board}
+	 * Realiza a sua posição inicial na {@link Board}
 	 * Após o posicionamento começa o seu movimento começando no sentido da esquerda para a direita.
 	 * A cada PLAYER_PLAY_INTERVAL lê o último código do sentido lido do teclado e realiza o movimento,
 	 * chamando readMovement.
@@ -32,8 +29,12 @@ public class HumanSnake extends Snake implements Serializable {
 	@Override
 	 public void run() {
 		 doInitialPositioning();
-
-		 while (true){
+		try {
+			Thread.sleep(10000);
+		} catch (InterruptedException e) {
+			throw new RuntimeException(e);
+		}
+		while (true){
 			 try {
 				 int keyCode = nextMoveCode;
 				 readMovement(keyCode);
@@ -47,38 +48,40 @@ public class HumanSnake extends Snake implements Serializable {
 	 }
 
 	/**
-	 * Este setter será chamado pelo {@link environment.LocalBoard}
+	 * Este 'setter' será chamado pelo {@link environment.LocalBoard}
 	 * pelo que será necessário sincronizar o objeto nextMoveCode,
 	 * prevenindo leituras e escritas no mesmo instante.
-	 * @param keyCode
+	 * @param keyCode inteiro que vai ser introduzido pelo ClientHandler associado a esta snake.
 	 */
 	public void setNextMoveCode(int keyCode) {
 		nextMoveCode = keyCode;
 	}
 
 	/**
-	 * Processa o movimento realizado pelo o player,
+	 * Processa o movimento realizado pelo ‘player’,
 	 * lendo a chave transmitida da janela ({@link java.awt.event.KeyListener}
 	 * Verifica qual dos sentidos foi lido do teclado e realiza o pedido de movimento para
 	 * a {@link Cell} correspondente (nextCell).
-	 * @param key
-	 * @throws InterruptedException
+	 * @param key recebido pela thread da HumanSnake a cada jogada.
 	 */
 	public void readMovement(int key) throws InterruptedException {
 		BoardPosition nextPosition = getCells().getLast().getPosition();
 		Cell nextCell;
 
-		if (key == KeyEvent.VK_RIGHT){
-			nextPosition = nextPosition.getCellRight();
-		} else if (key == KeyEvent.VK_LEFT) {
-			nextPosition = nextPosition.getCellLeft();
-		} else if (key == KeyEvent.VK_UP) {
-			nextPosition = nextPosition.getCellAbove();
-		} else if (key == KeyEvent.VK_DOWN){
-			nextPosition = nextPosition.getCellBelow();
-		} else {
-//			System.out.println("nada");
-			return; //se key for 0 neste caso sai do readmovemnt
+
+		switch (key){
+			case KeyEvent.VK_RIGHT:
+				nextPosition = nextPosition.getCellRight();
+				break;
+			case KeyEvent.VK_LEFT:
+				nextPosition = nextPosition.getCellLeft();
+				break;
+			case KeyEvent.VK_UP:
+				nextPosition = nextPosition.getCellAbove();
+				break;
+			case KeyEvent.VK_DOWN:
+				nextPosition = nextPosition.getCellBelow();
+				break;
 		}
 
 		if(!getBoard().isOutOfBounds(nextPosition)){

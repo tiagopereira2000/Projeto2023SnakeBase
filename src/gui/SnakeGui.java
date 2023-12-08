@@ -24,7 +24,7 @@ import environment.LocalBoard;
 public class SnakeGui implements Observer {
 	public static final int BOARD_WIDTH = 800;
 	public static final int BOARD_HEIGHT = 800;
-	public static final int NUM_COLUMNS = 40;
+	public static final int NUM_COLUMNS = 30;
 	public static final int NUM_ROWS = 30;
 	private JFrame frame;
 	private BoardComponent boardGui;

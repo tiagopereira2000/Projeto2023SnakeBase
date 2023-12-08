@@ -5,8 +5,8 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 public class ThreadPool {
 
-    private Worker[] workers;
-    private LinkedBlockingQueue<ObstacleMover> list = new LinkedBlockingQueue<>();   //list of tasks (ObstacleMover)
+    private final Worker[] workers;
+    private final LinkedBlockingQueue<ObstacleMover> list = new LinkedBlockingQueue<>();   //list of tasks (ObstacleMover)
 
     public ThreadPool(int numThreads){
         workers = new Worker[numThreads];
@@ -40,10 +40,11 @@ public class ThreadPool {
 
         @Override
         public void run() {
-
+            try {
+                Thread.sleep(10000);
+            } catch (InterruptedException ignored) {}
             while(true) {
                 try {
-//                    System.out.println("Running obstacle mover...");
                     ObstacleMover mover = list.take();
                     mover.start();
                     mover.join();

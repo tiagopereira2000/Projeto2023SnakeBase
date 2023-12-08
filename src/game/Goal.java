@@ -1,16 +1,12 @@
 package game;
 
 import environment.Board;
-import environment.BoardPosition;
-import environment.Cell;
-import environment.LocalBoard;
 
-import java.io.Serializable;
 
-public class Goal extends GameElement implements Serializable {
+public class Goal extends GameElement {
 	private static Goal instance;
 	private int value=1;
-	private Board board;
+	private final Board board;
 	public static final int MAX_VALUE=10;
 	private static Thread goalThread;
 	public Goal(Board board2) {

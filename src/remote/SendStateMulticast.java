@@ -5,7 +5,6 @@ import environment.GameState;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
-import java.util.ArrayList;
 
 public class SendStateMulticast extends Thread{
     private Board board;

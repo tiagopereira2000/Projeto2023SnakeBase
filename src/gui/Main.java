@@ -2,17 +2,22 @@ package gui;
 
 import environment.LocalBoard;
 import remote.Client;
+import remote.Server;
 
 import java.io.IOException;
-import java.util.Scanner;
 
+/**
+ * ‘App’ do jogo do lado do cliente, pede na consola para inserir o ip e porto do servidor.
+ * @author Tiago Pereira, Gonçalo Lopes
+ */
 public class Main {
 	public static void main(String[] args) throws IOException {
-		Scanner scanner = new Scanner(System.in);
-		System.out.println("enter Address of Server: ");
-		String address = scanner.nextLine();
-		System.out.println("enter PORT number: ");
-		String port = scanner.nextLine();
+		LocalBoard svBoard = new LocalBoard();
+		Server server = new Server(svBoard);
+		server.start();
+		String address = "localhost";
+		String port = "8888";
+		new Client(address, port).start();
 		new Client(address, port).start();
 	}
 }

@@ -6,9 +6,9 @@ import java.io.Serializable;
 import java.util.LinkedList;
 
 public class GameState implements Serializable {
-    private Cell[][] cells;
-    private LinkedList<Snake> snakes = new LinkedList<>();
-    private boolean isFinished = false;
+    private final Cell[][] cells;
+    private final LinkedList<Snake> snakes;
+    private final boolean isFinished;
 
     public GameState(Cell[][] cells, LinkedList<Snake> snakes, boolean isFinished) {
         this.cells = cells;
@@ -20,17 +20,8 @@ public class GameState implements Serializable {
         return cells;
     }
 
-    public void setCells(Cell[][] cells) {
-        this.cells = cells;
-    }
-
-
     public LinkedList<Snake> getSnakes() {
         return snakes;
-    }
-
-    public void setSnakes(LinkedList<Snake> snakes) {
-        this.snakes = snakes;
     }
 
     public boolean isFinished() {

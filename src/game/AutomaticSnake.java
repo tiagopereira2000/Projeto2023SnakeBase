@@ -1,14 +1,10 @@
 package game;
 
 import java.io.Serializable;
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 
-import javax.swing.text.Position;
 
 import environment.LocalBoard;
-import gui.SnakeGui;
 import environment.Cell;
 import environment.Board;
 import environment.BoardPosition;
@@ -32,6 +28,10 @@ public class AutomaticSnake extends Snake implements Serializable {
 	@Override
 	public void run() {
 		doInitialPositioning();
+		try {
+			Thread.sleep(10000);
+		} catch (InterruptedException e) {
+		}
 		System.err.println("initial size:" + getCells().size());
 
 		while(true){

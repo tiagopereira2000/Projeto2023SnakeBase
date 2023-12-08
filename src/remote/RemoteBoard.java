@@ -2,6 +2,7 @@ package remote;
 
 import environment.Board;
 import environment.Cell;
+import game.Snake;
 
 /** Remote representation of the game, no local threads involved.
  * Game state will be changed when updated info is received from Srver.
@@ -24,6 +25,21 @@ public class RemoteBoard extends Board{
 	@Override
 	public void handleKeyRelease() {
 		// em princípio vai ser ignorado
+	}
+
+	@Override
+	public void addSnake(Snake snake) {
+
+	}
+
+	@Override
+	public void wakeLazySnakes() {
+
+	}
+
+	@Override
+	public void interruptSnakes() {
+
 	}
 
 	@Override

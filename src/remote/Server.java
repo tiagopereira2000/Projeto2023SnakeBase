@@ -1,41 +1,36 @@
 package remote;
 
 import environment.Board;
-import environment.GameState;
 import environment.LocalBoard;
 import game.HumanSnake;
-import gui.SnakeGui;
 
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.ReentrantLock;
 
-public class Server{
-    private Board board;
+/**
+ *
+ * @author Tiago Pereira e Gonçalo Lopes
+ */
+public class Server extends Thread{
+    private final Board board;
     public static final int PORTO = 8888;
     private int idCount = LocalBoard.NUM_SNAKES; //1st client id
-
-    public Server(Board gameState) {
-        this.board = gameState;
+    private ServerSocket ss;
+    public Server(Board board) {
+        this.board = board;
     }
 
     public class ClientHandler extends Thread {
         private BufferedReader in;
-        private ObjectOutputStream out;
-        private Socket cliente;
-        private HumanSnake humanSnake; //cada client handler tem uma snake associada que vai ser o objeto do jogo de cada player
+        private final Socket cliente;
+        private HumanSnake humanSnake; //cada client handler tem uma snake associada que vai ser o objeto do jogo de cada ‘player’
 
         ClientHandler(Socket socket) {
             this.cliente = socket;
         }
 
+        @Override
         public void run() {
             try {
                 doConnections(cliente);
@@ -43,7 +38,7 @@ public class Server{
                 serve();
 
             } catch (IOException e) {
-//                throw new RuntimeException(e);
+                throw new RuntimeException(e);
             }
 
 
@@ -51,8 +46,7 @@ public class Server{
 
         void doConnections(Socket socket) throws IOException {
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            out = new ObjectOutputStream(socket.getOutputStream());
-            new SendStateMulticast(board, out).start();
+            new SendStateMulticast(board, new ObjectOutputStream(socket.getOutputStream())).start();
         }
 
         void initializeSnake() throws IOException {
@@ -63,7 +57,7 @@ public class Server{
         }
 
         private void serve() throws IOException {
-            while (true) {
+            while(true){
                 try {
                     humanSnake.setNextMoveCode(Integer.parseInt(in.readLine()));
                 }catch (IOException e){
@@ -76,17 +70,30 @@ public class Server{
 
     }
 
-    public void startServing() throws IOException {
-        ServerSocket ss = new ServerSocket(PORTO);
-        board.init();
+    @Override
+    public void run() {
         try {
+            ss = new ServerSocket(PORTO);
+            board.init();
             while (true) {
-                Socket socket = ss.accept(); //acept connection with client
-                ClientHandler clienteSock = new ClientHandler(socket); //generate new handler for client
-                clienteSock.start();
+                try {
+                    Socket socket = ss.accept();
+                    ClientHandler clienteSock = new ClientHandler(socket); //generate new handler for client
+                    clienteSock.start();
+                }catch (IOException ignored){
+                    System.out.println("socket refused");
+                    break;
+                }
             }
-        } finally {
-            ss.close();// Fecha o socket
+        } catch (IOException e) {
+            throw new RuntimeException(e); //ss = new ServerSocket(PORTO);
+        }
+        finally {
+            try {
+                ss.close();
+            } catch (IOException e) {
+                System.out.println("ss.close erro");
+            }
         }
     }
 
@@ -96,16 +103,15 @@ public class Server{
 
 
     /**
-     *  começará o jogo LocalBoard.init()
+     *  Começará o jogo LocalBoard.init()
      *  recebe pedidos de ligação de servidores e aceita-os --> cria socket.
-     *  começará a receber pedidos de movimentos dos jogadores
-     *  enviará estado do jogo a todas as Sockets a cada intervalo {@link environment.Board}.REMOTE_REFRESH_INTERVAL.
-     * @param args
+     *  Começará a receber pedidos de movimentos dos jogadores
+     *  enviará estado do jogo a todas os ‘Sockets’ a cada intervalo {@link environment.Board}.REMOTE_REFRESH_INTERVAL.
      */
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args)  {
         LocalBoard board = new LocalBoard();
         Server server = new Server(board);
-        server.startServing();
+        server.start();
     }
     
 }
