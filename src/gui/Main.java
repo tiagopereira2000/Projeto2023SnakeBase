@@ -4,6 +4,7 @@ import environment.LocalBoard;
 import remote.Client;
 import remote.Server;
 
+import java.awt.*;
 import java.io.IOException;
 
 /**

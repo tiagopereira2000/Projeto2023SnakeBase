@@ -2,7 +2,10 @@ package remote;
 
 import environment.Board;
 import environment.Cell;
+import game.HumanSnake;
 import game.Snake;
+
+import java.awt.*;
 
 /** Remote representation of the game, no local threads involved.
  * Game state will be changed when updated info is received from Srver.
@@ -11,10 +14,11 @@ import game.Snake;
  *
  */
 public class RemoteBoard extends Board{
-	Client client;
+	private Client client;
 	public RemoteBoard(Client client) {
 		this.client = client;
 	}
+
 
 	@Override
 	public void handleKeyPress(int keyCode) {

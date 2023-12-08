@@ -4,6 +4,7 @@ import environment.Board;
 import environment.BoardPosition;
 import environment.Cell;
 
+import java.awt.*;
 import java.awt.event.KeyEvent;
 
 /** Class for a remote snake, controlled by a human
@@ -13,8 +14,10 @@ import java.awt.event.KeyEvent;
   */
 public class HumanSnake extends Snake {
 	private int nextMoveCode = 0; //default
-	public HumanSnake(int id, Board board) {
+	public final Color color;
+	public HumanSnake(int id, Board board, Color color) {
 		super(id,board);
+		this.color = color;
 	}
 
 	/**

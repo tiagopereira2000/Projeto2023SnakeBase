@@ -4,9 +4,11 @@ import environment.Board;
 import environment.LocalBoard;
 import game.HumanSnake;
 
+import java.awt.*;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Random;
 
 /**
  *
@@ -51,7 +53,13 @@ public class Server extends Thread{
 
         void initializeSnake() throws IOException {
             idCount++; // itera o contador de ids de snakes
-            humanSnake = new HumanSnake(idCount, board);
+
+            //gerar uma nova cor para a HumanSnake
+            Random random = new Random();
+            float hue = random.nextFloat();
+            Color color = Color.getHSBColor(hue, 0.9f, 1.0f);
+
+            humanSnake = new HumanSnake(idCount, board, color);
             board.addSnake(humanSnake);
             humanSnake.start();
         }

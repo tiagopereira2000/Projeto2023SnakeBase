@@ -5,6 +5,7 @@ import environment.Board;
 import environment.GameState;
 import gui.SnakeGui;
 
+import java.awt.*;
 import java.io.*;
 import java.net.InetAddress;
 import java.net.Socket;
@@ -78,11 +79,7 @@ public class Client extends Thread{
 		out.println(0);
 	}
 
-	public static void main(String[] args) throws UnknownHostException {
-		Client client = new Client(args[0],args[1]);
-		Client client1 = new Client(args[0], args[1]);
-		client.start();
-		client1.start();
+	public static void main(String[] args) {
 	}
 
 }
