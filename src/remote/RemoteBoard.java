@@ -1,17 +1,11 @@
 package remote;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.PrintWriter;
-import java.util.LinkedList;
-
-import environment.LocalBoard;
 import environment.Board;
-import environment.BoardPosition;
 import environment.Cell;
-import game.Goal;
-import game.Obstacle;
+import game.HumanSnake;
 import game.Snake;
+
+import java.awt.*;
 
 /** Remote representation of the game, no local threads involved.
  * Game state will be changed when updated info is received from Srver.
@@ -20,20 +14,42 @@ import game.Snake;
  *
  */
 public class RemoteBoard extends Board{
-	
+	private Client client;
+	public RemoteBoard(Client client) {
+		this.client = client;
+	}
+
+
 	@Override
 	public void handleKeyPress(int keyCode) {
-		//TODO
+		//O cliente vai pressionar uma tecla e vai enviá-la para o servidor realizar o seu movimento
+		client.sendIntruction(keyCode);
 	}
 
 	@Override
 	public void handleKeyRelease() {
-		// TODO
+		// em princípio vai ser ignorado
+	}
+
+	@Override
+	public void addSnake(Snake snake) {
+
+	}
+
+	@Override
+	public void wakeLazySnakes() {
+
+	}
+
+	@Override
+	public void interruptSnakes() {
+
 	}
 
 	@Override
 	public void init() {
-		// TODO 		
+		// faz um pedido de inserção do player na board do servidor
+		client.requestSnake();
 	}
 
 

@@ -2,24 +2,21 @@ package environment;
 
 import game.*;
 
-import java.awt.event.KeyEvent;
 
 /** Class representing the state of a game running locally
  * 
  * @author luismota
  *
  */
-public class LocalBoard extends Board{
+public class LocalBoard extends Board {
 	
-	private static final int NUM_SNAKES = 5;
+	public static final int NUM_SNAKES = 5;
 	private static final int NUM_OBSTACLES = 20;
 	private static final int NUM_SIMULTANEOUS_MOVING_OBSTACLES = 3;
-	private static ThreadPool pool = new ThreadPool(NUM_SIMULTANEOUS_MOVING_OBSTACLES);
-	private static HumanSnake mySnake;
-	
+	private final static ThreadPool pool = new ThreadPool(NUM_SIMULTANEOUS_MOVING_OBSTACLES);
+
 
 	public LocalBoard() {
-		//threadpool já instanciada. sendo estática
  		createSnakes();
 		addObstacles(NUM_OBSTACLES);
 		submitObstacleMovers();
@@ -33,9 +30,8 @@ public class LocalBoard extends Board{
 		setChanged();
 	}
 
+
 	public void createSnakes(){
-		mySnake = new HumanSnake(NUM_SNAKES +1, this);
-		addSnake(mySnake);
 		for (int i = 0; i < NUM_SNAKES; i++) {
 			AutomaticSnake snake = new AutomaticSnake(i, this);
 			addSnake(snake);
@@ -51,12 +47,29 @@ public class LocalBoard extends Board{
 
 	@Override
 	public void handleKeyPress(int keyCode) {
-		mySnake.setNextMoveCode(keyCode);	// ERROR: handle KeyPress not focused on window
 	}
 
 	@Override
 	public void handleKeyRelease() {
 		// do nothing... No keys relevant in local game
+	}
+
+	@Override
+	public void wakeLazySnakes() {
+		for (Snake s: snakes) {
+			if(s instanceof AutomaticSnake)
+				s.interrupt();
+		}
+	}
+
+	@Override
+	public void addSnake(Snake snake) {
+		snakes.add(snake);
+	}
+
+	@Override
+	public void interruptSnakes() {
+		for (Snake s: snakes) s.interrupt();
 	}
 
 	/**
@@ -66,6 +79,7 @@ public class LocalBoard extends Board{
 	@Override
 	public void terminate() {
 		super.terminate();
+		interruptSnakes();
 		pool.shutdownNow();
 	}
 }

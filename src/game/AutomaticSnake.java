@@ -1,19 +1,16 @@
 package game;
 
-import java.util.Iterator;
-import java.util.LinkedList;
+import java.io.Serializable;
 import java.util.List;
 
-import javax.swing.text.Position;
 
 import environment.LocalBoard;
-import gui.SnakeGui;
 import environment.Cell;
 import environment.Board;
 import environment.BoardPosition;
 
 
-public class AutomaticSnake extends Snake {
+public class AutomaticSnake extends Snake implements Serializable {
 	protected boolean resetMove = false; //se a snake tiver sido interrompida para adotar outro caminho
 	public AutomaticSnake(int id, LocalBoard board) {
 		super(id,board);
@@ -31,18 +28,20 @@ public class AutomaticSnake extends Snake {
 	@Override
 	public void run() {
 		doInitialPositioning();
+		try {
+			Thread.sleep(10000);
+		} catch (InterruptedException e) {
+		}
 		System.err.println("initial size:" + getCells().size());
 
-		//TODO: automatic movement
 		while(true){
 			Cell nextCell = getBoard().getCell(getNextPosition()); //NextPosition() -> (BP) bestoption -> (Cell) bestoption
 			try {
-				move(nextCell); // Snake.move()
+				move(nextCell);
 				Thread.sleep(Board.PLAYER_PLAY_INTERVAL);
 			}catch (InterruptedException e){
 				if(getBoard().isFinished())
 					break;
-//				System.out.println("Snake interrompida -> reset direção");
 				resetMove = true;
 			}
 		}

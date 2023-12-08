@@ -3,8 +3,8 @@ package game;
 import environment.LocalBoard;
 
 public class ObstacleMover extends Thread {
-	private Obstacle obstacle;
-	private LocalBoard board;
+	private final Obstacle obstacle;
+	private final LocalBoard board;
 	
 	public ObstacleMover(Obstacle obstacle, LocalBoard board) {
 		super();
@@ -15,7 +15,6 @@ public class ObstacleMover extends Thread {
 	@Override
 	public void run(){
 		while(obstacle.hasRemainingMoves()){
-			//mover obstaculo movimento random
 			board.moveObstacle(obstacle);
 			obstacle.decrementRemaingMoves();
 			board.setChanged();

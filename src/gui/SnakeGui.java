@@ -24,13 +24,17 @@ import environment.LocalBoard;
 public class SnakeGui implements Observer {
 	public static final int BOARD_WIDTH = 800;
 	public static final int BOARD_HEIGHT = 800;
-	public static final int NUM_COLUMNS = 40;
+	public static final int NUM_COLUMNS = 30;
 	public static final int NUM_ROWS = 30;
 	private JFrame frame;
 	private BoardComponent boardGui;
 	private Board board;
 
-	public SnakeGui(Board board, int x,int y) {
+	public BoardComponent getBoardGui() {
+		return boardGui;
+	}
+
+	public SnakeGui(Board board, int x, int y) {
 		super();
 		this.board=board;
 		frame= new JFrame("The Snake Game: "+(board instanceof LocalBoard?"Local":"Remote"));
@@ -70,7 +74,7 @@ public class SnakeGui implements Observer {
 	}
 
 	@Override
-	public void update(Observable o, Object arg) {
-		boardGui.repaint();
-	}
+		public void update(Observable o, Object arg) {
+			boardGui.repaint();
+		}
 }

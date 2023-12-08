@@ -9,6 +9,8 @@ import game.HumanSnake;
 import game.Obstacle;
 import game.Snake;
 import game.AutomaticSnake;
+import remote.RemoteBoard;
+
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
@@ -17,6 +19,7 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.Random;
 
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
@@ -69,12 +72,13 @@ public class BoardComponent extends JComponent implements KeyListener{
 								(int)Math.round((cell.getPosition().y+0.9) * CELL_WIDTH));
 					}
 				if (cell.isOcupiedBySnake()) {
-					// different color for human player...
-					if(cell.getOcuppyingSnake() instanceof HumanSnake)
-						g.setColor(Color.ORANGE);
-					else
+					// different color for every human player...
+					if(cell.getOcuppyingSnake() instanceof HumanSnake){
+						g.setColor(((HumanSnake) cell.getOcuppyingSnake()).color);
+					} else {
 						g.setColor(Color.LIGHT_GRAY);
-					g.fillRect((int)Math.round(cell.getPosition().x* CELL_WIDTH), 
+					}
+					g.fillRect((int)Math.round(cell.getPosition().x* CELL_WIDTH),
 							(int)Math.round(cell.getPosition().y * CELL_WIDTH),
 							(int)Math.round(CELL_WIDTH), (int)Math.round(CELL_WIDTH));
 					

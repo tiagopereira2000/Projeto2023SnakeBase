@@ -9,18 +9,20 @@ import java.util.Observable;
 import game.*;
 //import jdk.vm.ci.meta.Local;
 
-public abstract class Board extends Observable {
+public abstract class Board extends Observable implements Serializable{
 	protected Cell[][] cells;
-	private BoardPosition goalPosition;
-	public static final long PLAYER_PLAY_INTERVAL = 150;
-	public static final long REMOTE_REFRESH_INTERVAL = 200;
+	private transient BoardPosition goalPosition;
+	public static final long PLAYER_PLAY_INTERVAL = 200;
+	public static final long REMOTE_REFRESH_INTERVAL = 50;
 	public static final int NUM_COLUMNS = 30;
 	public static final int NUM_ROWS = 30;
 	protected LinkedList<Snake> snakes = new LinkedList<>();
-	private LinkedList<Obstacle> obstacles = new LinkedList<>();
-	protected boolean isFinished = false;
+	private final transient LinkedList<Obstacle> obstacles = new LinkedList<>();
+	protected transient boolean isFinished = false;
 
-
+	public Cell[][] getCells() {
+		return cells;
+	}
 
 	public Board() {
 		cells = new Cell[NUM_COLUMNS][NUM_ROWS];
@@ -41,9 +43,7 @@ public abstract class Board extends Observable {
 	}
 
 	public boolean isOutOfBounds(BoardPosition p){
-		if (p.x >= NUM_COLUMNS || p.x < 0 || p.y >= NUM_ROWS || p.y < 0)
-			return true;
-		return false;
+		return p.x >= NUM_COLUMNS || p.x < 0 || p.y >= NUM_ROWS || p.y < 0;
 	}
 
 	protected BoardPosition getRandomPosition() {
@@ -73,8 +73,9 @@ public abstract class Board extends Observable {
 
 	/**
 	 * Implementado da mesma forma que addGameElement.
-	 * Não tendo em conta elementos do tipo Goal.
-	 * @param obstacle
+	 * Não tendo em conta elementos do tipo ‘Goal’.
+	 * @param obstacle do tipo {@link Obstacle} implementado
+	 * pela Thread de {@link ObstacleMover} associado.
 	 */
 	public void moveObstacle(Obstacle obstacle){
 		boolean placed=false;
@@ -87,7 +88,7 @@ public abstract class Board extends Observable {
 	}
 
 	public List<BoardPosition> getNeighboringPositions(Cell cell) {
-		ArrayList<BoardPosition> possibleCells=new ArrayList<BoardPosition>();
+		ArrayList<BoardPosition> possibleCells=new ArrayList<>();
 		BoardPosition pos=cell.getPosition();
 		if(pos.x>0)
 			possibleCells.add(pos.getCellLeft());
@@ -101,10 +102,9 @@ public abstract class Board extends Observable {
 	}
 
 
-	protected Goal addGoal() {
-		Goal goal= Goal.getInstance(this); // uma só instância do goal
+	protected void addGoal() {
+		Goal goal= Goal.getInstance(this); // uma só instância do ‘goal’
 		addGameElement(goal);
-		return goal;
 	}
 
 	protected void addObstacles(int numberObstacles) {
@@ -129,46 +129,40 @@ public abstract class Board extends Observable {
 		notifyObservers();
 	}
 
+
 	public LinkedList<Obstacle> getObstacles() {
 		return obstacles;
 	}
 
+	public void setSnakes(LinkedList<Snake> snakes) {
+		this.snakes = snakes;
+	}
+
+	public void setCells(Cell[][] cells) {
+		this.cells = cells;
+	}
 
 	/**
-	 * métodos abstract implementados em {@link LocalBoard}.
+	 * Método ‘abstract’ implementados em {@link LocalBoard}.
 	 */
 	public abstract void init(); 
 	
 	public abstract void handleKeyPress(int keyCode);
 
 	public abstract void handleKeyRelease();
-	
 
-	public void addSnake(Snake snake) {
-		snakes.add(snake);
-	}
+	public abstract void addSnake(Snake snake);
 
 	/**
 	 * Método vai ser chamado após clique no botão "reset snakes".
 	 * Interruperá todas as {@link AutomaticSnake}.
 	 * return: void
 	 */
-	public void wakeLazySnakes()  {
-		for (Snake s: snakes) {
-			if(s instanceof AutomaticSnake)
-				s.interrupt();
-		}
-	}
+	public abstract void wakeLazySnakes();
 
-	public void interruptSnakes(){
-		for (Snake s:
-			 snakes) {
-			s.interrupt();
-		}
-	}
+	public abstract void interruptSnakes();
 
 	public void terminate() {
 		isFinished=true;
-		interruptSnakes();
 	}
 }

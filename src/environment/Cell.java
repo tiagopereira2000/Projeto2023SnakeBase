@@ -1,6 +1,6 @@
 package environment;
 
-import java.util.concurrent.TimeUnit;
+import java.io.Serializable;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -11,12 +11,12 @@ import game.*;
  * @author luismota
  *
  */
-public class Cell {
-	private BoardPosition position;
+public class Cell implements Serializable {
+	private final BoardPosition position;
 	private Snake ocuppyingSnake = null;
 	private GameElement gameElement=null;
-	private ReentrantLock lock = new ReentrantLock();
-	private Condition free = lock.newCondition();
+	private final ReentrantLock lock = new ReentrantLock();
+	private final Condition free = lock.newCondition();
 	public GameElement getGameElement() {
 		return gameElement;
 	}
