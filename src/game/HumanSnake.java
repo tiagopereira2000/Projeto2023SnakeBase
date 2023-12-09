@@ -13,7 +13,7 @@ import java.awt.event.KeyEvent;
   *
   */
 public class HumanSnake extends Snake {
-	private int nextMoveCode = 0; //default
+	private int nextMoveCode = KeyEvent.VK_RIGHT; //default
 	public final Color color;
 	public HumanSnake(int id, Board board, Color color) {
 		super(id,board);
@@ -31,12 +31,6 @@ public class HumanSnake extends Snake {
 	 */
 	@Override
 	 public void run() {
-		 doInitialPositioning();
-		try {
-			Thread.sleep(10000);
-		} catch (InterruptedException e) {
-			throw new RuntimeException(e);
-		}
 		while (true){
 			 try {
 				 int keyCode = nextMoveCode;

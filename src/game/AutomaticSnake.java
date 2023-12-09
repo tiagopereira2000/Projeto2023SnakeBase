@@ -27,13 +27,6 @@ public class AutomaticSnake extends Snake implements Serializable {
 	 */
 	@Override
 	public void run() {
-		doInitialPositioning();
-		try {
-			Thread.sleep(10000);
-		} catch (InterruptedException e) {
-		}
-		System.err.println("initial size:" + getCells().size());
-
 		while(true){
 			Cell nextCell = getBoard().getCell(getNextPosition()); //NextPosition() -> (BP) bestoption -> (Cell) bestoption
 			try {

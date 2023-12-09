@@ -40,9 +40,6 @@ public class ThreadPool {
 
         @Override
         public void run() {
-            try {
-                Thread.sleep(10000);
-            } catch (InterruptedException ignored) {}
             while(true) {
                 try {
                     ObstacleMover mover = list.take();

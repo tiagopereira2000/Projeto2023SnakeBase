@@ -61,7 +61,7 @@ public class Server extends Thread{
 
             humanSnake = new HumanSnake(idCount, board, color);
             board.addSnake(humanSnake);
-            humanSnake.start();
+            humanSnake.doInitialPositioning();
         }
 
         private void serve() throws IOException {
@@ -78,11 +78,24 @@ public class Server extends Thread{
 
     }
 
+    /**
+     *
+     */
     @Override
     public void run() {
         try {
             ss = new ServerSocket(PORTO);
-            board.init();
+
+            new Thread(() -> {
+                try {
+                    Thread.sleep(10000);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }finally {
+                    board.init();
+                }
+            }).start();
+
             while (true) {
                 try {
                     Socket socket = ss.accept();

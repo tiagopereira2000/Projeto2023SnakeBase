@@ -35,8 +35,11 @@ public class LocalBoard extends Board {
 		for (int i = 0; i < NUM_SNAKES; i++) {
 			AutomaticSnake snake = new AutomaticSnake(i, this);
 			addSnake(snake);
+			snake.doInitialPositioning();
 		}
 	}
+
+
 
 	public void submitObstacleMovers(){
 		for(Obstacle o: getObstacles()){
