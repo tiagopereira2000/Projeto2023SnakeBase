@@ -6,6 +6,11 @@ import environment.Cell;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.Socket;
 
 /** Class for a remote snake, controlled by a human
   * 
@@ -15,9 +20,35 @@ import java.awt.event.KeyEvent;
 public class HumanSnake extends Snake {
 	private int nextMoveCode = KeyEvent.VK_RIGHT; //default
 	public final Color color;
-	public HumanSnake(int id, Board board, Color color) {
+	private transient final Socket client;
+	private transient BufferedReader reader;
+	private transient Thread handleMoves;
+
+	public HumanSnake(int id, Board board, Color color, Socket client) throws IOException {
 		super(id,board);
 		this.color = color;
+		this.client = client;
+		createReader();
+		generateHandleMoves();
+		board.addSnake(this);
+		doInitialPositioning();
+	}
+
+	private void generateHandleMoves() {
+		handleMoves = new Thread(()->{
+			while (true){
+				try {
+					buffering();
+				} catch (IOException e) {
+					e.printStackTrace();
+					break;
+				}
+			}
+		});
+	}
+
+	void createReader() throws IOException{
+		reader = new BufferedReader(new InputStreamReader(client.getInputStream()));
 	}
 
 	/**
@@ -31,19 +62,30 @@ public class HumanSnake extends Snake {
 	 */
 	@Override
 	 public void run() {
+		handleMoves.start();
 		while (true){
 			 try {
-				 int keyCode = nextMoveCode;
-				 readMovement(keyCode);
+				 int key = nextMoveCode;
+				 readMovement(key);
 				 Thread.sleep(Board.PLAYER_PLAY_INTERVAL);
 			 } catch (InterruptedException e) {
 				 System.out.println("Interrupoted Human");
-				 if(getBoard().isFinished())
+				 if(getBoard().isFinished()){
+					 try {
+						 client.close();
+					 } catch (IOException ex) {
+						 ex.printStackTrace();
+					 }
+					 handleMoves.interrupt();
 					 break;
+				 }
 			 }
 		 }
 	 }
 
+	private void buffering() throws IOException {
+		setNextMoveCode(Integer.parseInt(reader.readLine()));
+	}
 	/**
 	 * Este 'setter' será chamado pelo {@link environment.LocalBoard}
 	 * pelo que será necessário sincronizar o objeto nextMoveCode,

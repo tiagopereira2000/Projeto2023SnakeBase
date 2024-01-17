@@ -19,6 +19,7 @@ public abstract class Board extends Observable implements Serializable{
 	protected LinkedList<Snake> snakes = new LinkedList<>();
 	private final transient LinkedList<Obstacle> obstacles = new LinkedList<>();
 	protected transient boolean isFinished = false;
+	protected transient boolean hasStarted = false;
 
 	public Cell[][] getCells() {
 		return cells;

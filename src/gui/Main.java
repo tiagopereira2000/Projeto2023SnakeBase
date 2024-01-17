@@ -17,7 +17,7 @@ public class Main {
 		Server server = new Server(svBoard);
 		server.start();
 		String address = "localhost";
-		String port = "8888";
+		int port = 8888;
 		new Client(address, port).start();
 		new Client(address, port).start();
 	}

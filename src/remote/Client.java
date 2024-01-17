@@ -7,10 +7,8 @@ import gui.SnakeGui;
 
 import java.awt.*;
 import java.io.*;
-import java.net.InetAddress;
-import java.net.Socket;
+import java.net.*;
 import java.io.IOException;
-import java.net.UnknownHostException;
 
 /** Remore client, only for part II
  * 
@@ -25,11 +23,13 @@ public class Client extends Thread{
 	private PrintWriter out; //integer out
 	private Socket socket;
 	private InetAddress address;
-	private final int port;
+	private final int socketPort;
 
-	public Client(String addr, String port) throws UnknownHostException {
+
+
+	public Client(String addr, int socketPort) throws UnknownHostException {
 		address = InetAddress.getByName(addr);
-		this.port = Integer.parseInt(port);
+		this.socketPort = socketPort;
 		myBoard = new RemoteBoard(this);
 		game = new SnakeGui(myBoard,600,0);
 	}
@@ -40,16 +40,17 @@ public class Client extends Thread{
 			connectToServer();
 			game.init();
 			readGameState();
-		} catch (IOException | ClassNotFoundException | InterruptedException e) {// ERRO...
-		} finally {//a fechar...
+		} catch (IOException | ClassNotFoundException e) {
 			try {
 				socket.close();
-			} catch (IOException e) {//...
+			} catch (IOException ex) {
+				e.printStackTrace();
 			}
 		}
 	}
 
-	private void readGameState() throws IOException, ClassNotFoundException, InterruptedException {
+
+	private void readGameState() throws IOException, ClassNotFoundException {
 		while(true){
 			GameState gameState = (GameState) in.readObject();
 			if(gameState.isFinished()) break;
@@ -62,7 +63,7 @@ public class Client extends Thread{
 
 	void connectToServer() throws IOException {
 			System.out.println("Endereco:" + address);
-			socket = new Socket(address, port);
+			socket = new Socket(address, socketPort);
 			System.out.println("Socket:" + socket);
 			in = new ObjectInputStream(socket.getInputStream());
 			out = new PrintWriter(
@@ -79,7 +80,10 @@ public class Client extends Thread{
 		out.println(0);
 	}
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws UnknownHostException {
+		String address = "localhost";
+		int port = 8888;
+		new Client(address, port).start();
 	}
 
 }

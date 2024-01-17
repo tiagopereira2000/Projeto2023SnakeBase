@@ -2,6 +2,9 @@ package environment;
 
 import game.*;
 
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
+
 
 /** Class representing the state of a game running locally
  * 
@@ -14,7 +17,8 @@ public class LocalBoard extends Board {
 	private static final int NUM_OBSTACLES = 20;
 	private static final int NUM_SIMULTANEOUS_MOVING_OBSTACLES = 3;
 	private final static ThreadPool pool = new ThreadPool(NUM_SIMULTANEOUS_MOVING_OBSTACLES);
-
+	private ReentrantLock gameLock = new ReentrantLock();
+	private Condition isPlayerConnected = gameLock.newCondition();
 
 	public LocalBoard() {
  		createSnakes();
@@ -24,12 +28,33 @@ public class LocalBoard extends Board {
 	}
 
 	public void init() {
+		waitForHumanPlayer();
 		for(Snake s:snakes)
 			s.start();
 		pool.execute();
 		setChanged();
 	}
 
+	private void waitForHumanPlayer() {
+		try{
+			gameLock.lock();
+			isPlayerConnected.await();
+		}catch (InterruptedException e){
+			e.printStackTrace();
+		} finally {
+			gameLock.unlock();
+		}
+	}
+
+	public void signalHumanPlayer(HumanSnake snake){
+		try {
+			gameLock.lock();
+			isPlayerConnected.signal();
+			snake.start();
+		} finally {
+			gameLock.unlock();
+		}
+	}
 
 	public void createSnakes(){
 		for (int i = 0; i < NUM_SNAKES; i++) {

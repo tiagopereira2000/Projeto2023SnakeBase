@@ -69,10 +69,9 @@ public abstract class Snake extends Thread implements Serializable{
 		}
 
 		return coordinates;
-	}
-
+	}	
 	public void doInitialPositioning() {
-		// Random position on the first column.
+		// Random position on the first column. 
 		// At startup, snake occupies a single cell
 		BoardPosition at = new BoardPosition(0,0);
 		int posX = 0;
@@ -87,7 +86,7 @@ public abstract class Snake extends Thread implements Serializable{
 		}
 
 		cells.add(board.getCell(at)); //adicionar primeira posição celular da snake à linkedlist
-		System.err.println("Snake "+getIdentification()+" starting at:"+getCells().getLast());
+		System.err.println("Snake "+getIdentification()+" starting at:"+getCells().getLast());		
 	}
 	
 	public Board getBoard() {

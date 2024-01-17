@@ -8,6 +8,9 @@ import java.awt.*;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Random;
 
 /**
@@ -19,64 +22,51 @@ public class Server extends Thread{
     public static final int PORTO = 8888;
     private int idCount = LocalBoard.NUM_SNAKES; //1st client id
     private ServerSocket ss;
+    private SendStateMulticast multicast;
+
     public Server(Board board) {
         this.board = board;
+        multicast = new SendStateMulticast(board);
     }
 
-    public class ClientHandler extends Thread {
-        private BufferedReader in;
-        private final Socket cliente;
-        private HumanSnake humanSnake; //cada client handler tem uma snake associada que vai ser o objeto do jogo de cada ‘player’
 
-        ClientHandler(Socket socket) {
-            this.cliente = socket;
+    class ClientHandler extends Thread{
+        Socket client;
+        ObjectOutputStream stream;
+        InputStreamReader reader;
+
+        public ClientHandler(Socket client) throws IOException {
+            this.client = client;
+            stream = new ObjectOutputStream(client.getOutputStream());
         }
 
         @Override
         public void run() {
             try {
-                doConnections(cliente);
-                initializeSnake();
-                serve();
-
+                connecting();
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                e.printStackTrace();
             }
-
-
         }
 
-        void doConnections(Socket socket) throws IOException {
-            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            new SendStateMulticast(board, new ObjectOutputStream(socket.getOutputStream())).start();
-        }
-
-        void initializeSnake() throws IOException {
+        private void connecting() throws IOException {
             idCount++; // itera o contador de ids de snakes
+//            new SendStateUnicast(board, stream).start();
+            multicast.addStreamToMulticast(stream);
+            HumanSnake mySnake = new HumanSnake(idCount, board, generateColor(), client);
+            ((LocalBoard) board).signalHumanPlayer(mySnake);
+        }
 
-            //gerar uma nova cor para a HumanSnake
+
+        public Color generateColor(){
             Random random = new Random();
             float hue = random.nextFloat();
-            Color color = Color.getHSBColor(hue, 0.9f, 1.0f);
-
-            humanSnake = new HumanSnake(idCount, board, color);
-            board.addSnake(humanSnake);
-            humanSnake.doInitialPositioning();
+            return Color.getHSBColor(hue, 0.9f, 1.0f);
         }
-
-        private void serve() throws IOException {
-            while(true){
-                try {
-                    humanSnake.setNextMoveCode(Integer.parseInt(in.readLine()));
-                }catch (IOException e){
-                    in.close();
-                    break;
-                }
-            }
-        }
-
 
     }
+
+
 
     /**
      *
@@ -85,29 +75,29 @@ public class Server extends Thread{
     public void run() {
         try {
             ss = new ServerSocket(PORTO);
-
             new Thread(() -> {
-                try {
-                    Thread.sleep(10000);
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }finally {
-                    board.init();
-                }
+//                try {
+//                    multicast.start();
+//                    Thread.sleep(3000);
+//                } catch (InterruptedException e) {
+//                    throw new RuntimeException(e);
+//                }finally {
+//                    board.init();
+//                }
+                multicast.start();
+                board.init();
             }).start();
 
             while (true) {
                 try {
-                    Socket socket = ss.accept();
-                    ClientHandler clienteSock = new ClientHandler(socket); //generate new handler for client
-                    clienteSock.start();
+                     new ClientHandler(ss.accept()).start();
                 }catch (IOException ignored){
                     System.out.println("socket refused");
                     break;
                 }
             }
         } catch (IOException e) {
-            throw new RuntimeException(e); //ss = new ServerSocket(PORTO);
+            e.printStackTrace();
         }
         finally {
             try {

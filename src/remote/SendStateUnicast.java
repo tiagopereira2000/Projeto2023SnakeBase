@@ -5,34 +5,41 @@ import environment.GameState;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.net.InetAddress;
+import java.net.Socket;
 
-public class SendStateMulticast extends Thread{
+public class SendStateUnicast extends Thread{
     private Board board;
-    private ObjectOutputStream out;
+    private ObjectOutputStream stream;
 
-    public SendStateMulticast(Board board, ObjectOutputStream out) {
+    public SendStateUnicast(Board board, ObjectOutputStream stream) {
         this.board = board;
-        this.out = out;
+        this.stream = stream;
+    }
+
+    public void sendGameState(GameState gameState) throws IOException {
+        stream.reset();
+        stream.writeObject(gameState);
+        stream.flush();
     }
 
     @Override
     public void run() {
-        System.out.println("Multicast iniciado!");
+        System.out.println("unicast iniciado!");
         while (true){
             try{
-                out.writeObject(new GameState(
+                sendGameState(new GameState(
                         board.getCells(),
                         board.getSnakes(),
                         board.isFinished()));
-                out.flush();
-                out.reset();
-            } catch (IOException e) {
-                System.out.println("o.writeObject() throws IOEx");
+
+            }catch (IOException e){
                 try {
-                    out.close();
+                    stream.close();
                 } catch (IOException ex) {
-                    throw new RuntimeException(ex);
+                    ex.printStackTrace();
                 }
+                break;
             }
             try{
                 Thread.sleep(Board.REMOTE_REFRESH_INTERVAL);
